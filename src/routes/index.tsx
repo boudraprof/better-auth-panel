@@ -381,18 +381,6 @@ function AdminDashboard() {
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="text-sm">{total} Users</Badge>
-          <Link to="/audit-log">
-            <Button variant="outline">
-              <FileText className="size-4 mr-1" />
-              Audit Log
-            </Button>
-          </Link>
-          <Link to="/analytics">
-            <Button variant="outline">
-              <BarChart3 className="size-4 mr-1" />
-              Analytics
-            </Button>
-          </Link>
           <Button variant="outline" onClick={handleExportUsers}>
             <Download className="size-4 mr-1" />
             Export

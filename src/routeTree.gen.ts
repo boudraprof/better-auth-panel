@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportCenterRouteImport } from './routes/support-center'
 import { Route as RateLimitsRouteImport } from './routes/rate-limits'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
@@ -23,6 +24,11 @@ import { Route as AuthForgotpasswordRouteImport } from './routes/auth.forgotpass
 import { Route as ApiV1AuthSplatRouteImport } from './routes/api.v1.auth.$'
 import { Route as ApiV1AdminSplatRouteImport } from './routes/api.v1.admin.$'
 
+const SupportCenterRoute = SupportCenterRouteImport.update({
+  id: '/support-center',
+  path: '/support-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RateLimitsRoute = RateLimitsRouteImport.update({
   id: '/rate-limits',
   path: '/rate-limits',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/organizations': typeof OrganizationsRoute
   '/profile': typeof ProfileRoute
   '/rate-limits': typeof RateLimitsRoute
+  '/support-center': typeof SupportCenterRoute
   '/auth/forgotpassword': typeof AuthForgotpasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/organizations': typeof OrganizationsRoute
   '/profile': typeof ProfileRoute
   '/rate-limits': typeof RateLimitsRoute
+  '/support-center': typeof SupportCenterRoute
   '/auth/forgotpassword': typeof AuthForgotpasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/organizations': typeof OrganizationsRoute
   '/profile': typeof ProfileRoute
   '/rate-limits': typeof RateLimitsRoute
+  '/support-center': typeof SupportCenterRoute
   '/auth/forgotpassword': typeof AuthForgotpasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/profile'
     | '/rate-limits'
+    | '/support-center'
     | '/auth/forgotpassword'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/profile'
     | '/rate-limits'
+    | '/support-center'
     | '/auth/forgotpassword'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/organizations'
     | '/profile'
     | '/rate-limits'
+    | '/support-center'
     | '/auth/forgotpassword'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   OrganizationsRoute: typeof OrganizationsRoute
   ProfileRoute: typeof ProfileRoute
   RateLimitsRoute: typeof RateLimitsRoute
+  SupportCenterRoute: typeof SupportCenterRoute
   AuthForgotpasswordRoute: typeof AuthForgotpasswordRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support-center': {
+      id: '/support-center'
+      path: '/support-center'
+      fullPath: '/support-center'
+      preLoaderRoute: typeof SupportCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rate-limits': {
       id: '/rate-limits'
       path: '/rate-limits'
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrganizationsRoute: OrganizationsRoute,
   ProfileRoute: ProfileRoute,
   RateLimitsRoute: RateLimitsRoute,
+  SupportCenterRoute: SupportCenterRoute,
   AuthForgotpasswordRoute: AuthForgotpasswordRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,

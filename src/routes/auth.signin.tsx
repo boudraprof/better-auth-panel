@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Eye, EyeOff } from 'lucide-react'
 import z from 'zod'
 
 import { useState } from 'react'
@@ -26,6 +26,7 @@ export const Route = createFileRoute('/auth/signin')({
 function SignIn() {
   const router = useRouter()
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm({
     defaultValues: {
@@ -44,12 +45,14 @@ function SignIn() {
       }
       // Route middleware only runs on full page loads — a client-side
       // navigate() to '/' would render the dashboard before the admin check.
-      // Redirect by role so non-admins land on /forbidden (the middleware
-      // stays as defense-in-depth for direct loads).
+      // Redirect by role so non-admins are bounced back to sign-in with a
+      // clear message (the middleware stays as defense-in-depth for direct
+      // loads).
       if (res.data?.user.role === 'admin') {
         router.navigate({ to: '/' })
       } else {
-        router.navigate({ to: '/forbidden' })
+        setErrorMessage('Access denied: this panel is admin-only.')
+        logger.warn(`Non-admin sign-in rejected: ${res.data?.user.email}`, 'Auth')
       }
     },
   })
@@ -69,7 +72,7 @@ function SignIn() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }} className="grid gap-4">
             <form.Field
               name="email"
               validators={{
@@ -108,16 +111,26 @@ function SignIn() {
               children={(field) => (
                 <div className="grid gap-2">
                   <Label htmlFor={field.name}>Password</Label>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    type="password"
-                    placeholder="password"
-                    autoComplete="password"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
+                  <div className="relative">
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="password"
+                      autoComplete="password"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      onClick={() => setShowPassword((s) => !s)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    >
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
                   <InputError field={field} />
                 </div>
               )}
@@ -146,7 +159,7 @@ function SignIn() {
             <Link to="/auth/forgotpassword" className="text-center text-sm text-gray-300 hover:underline">
               Forgot password?
             </Link>
-          </div>
+          </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <div className="w-full border-t" />

@@ -57,37 +57,38 @@ async function rateLimit(key: string, max: number, windowMs: number): Promise<bo
 
 /**
  * Custom admin subpaths handled by this route. Anything else under
- * /v1/api/admin/* (e.g. Better Auth's own /admin/list-users, /admin/ban-user)
+ * /api/v1/admin/* (e.g. Better Auth's own /admin/list-users, /admin/ban-user)
  * is forwarded to auth.handler so the admin plugin keeps working.
  */
 const ADMIN_CUSTOM_PATHS = new Set([
-  '/v1/api/admin/stats',
-  '/v1/api/admin/accounts',
-  '/v1/api/admin/sessions',
-  '/v1/api/admin/sessions/revoke',
-  '/v1/api/admin/seed-users',
-  '/v1/api/admin/audit-logs',
-  '/v1/api/admin/analytics',
-  '/v1/api/admin/email-verify',
-  '/v1/api/admin/bulk-actions',
-  '/v1/api/admin/export-users',
-  '/v1/api/admin/hardware',
-  '/v1/api/admin/disable-2fa',
-  '/v1/api/admin/user-activity',
-  '/v1/api/admin/email-config',
-  '/v1/api/admin/email-config/test',
-  '/v1/api/admin/rate-limits',
-  '/v1/api/admin/organizations',
-  '/v1/api/admin/organizations/members',
-  '/v1/api/admin/organizations/delete',
-  '/v1/api/admin/oauth-providers',
+  '/api/v1/admin/stats',
+  '/api/v1/admin/accounts',
+  '/api/v1/admin/sessions',
+  '/api/v1/admin/sessions/revoke',
+  '/api/v1/admin/seed-users',
+  '/api/v1/admin/audit-logs',
+  '/api/v1/admin/analytics',
+  '/api/v1/admin/email-verify',
+  '/api/v1/admin/bulk-actions',
+  '/api/v1/admin/export-users',
+  '/api/v1/admin/hardware',
+  '/api/v1/admin/disable-2fa',
+  '/api/v1/admin/user-activity',
+  '/api/v1/admin/email-config',
+  '/api/v1/admin/email-config/test',
+  '/api/v1/admin/rate-limits',
+  '/api/v1/admin/organizations',
+  '/api/v1/admin/organizations/members',
+  '/api/v1/admin/organizations/delete',
+  '/api/v1/admin/support-users',
+  '/api/v1/admin/support-sessions',
 ])
 
 /**
  * Admin-only endpoints that mirror Better Auth Studio's dashboard extras:
- *  - GET /v1/api/admin/stats      -> user counts (total, admins, verified, banned)
- *  - GET /v1/api/admin/accounts   -> linked accounts for a given userId
- *  - POST /v1/api/admin/seed-users -> bulk-create random test users
+ *  - GET /api/v1/admin/stats      -> user counts (total, admins, verified, banned)
+ *  - GET /api/v1/admin/accounts   -> linked accounts for a given userId
+ *  - POST /api/v1/admin/seed-users -> bulk-create random test users
  *
  * Authorization is enforced here (admin role) in addition to the route-level
  * adminMiddleware used by the /admin page, because these are raw API endpoints
@@ -97,6 +98,30 @@ async function requireAdmin(request: Request) {
   const ses = await getServerSession(request.headers)
   const result = assertAdmin(ses)
   if (!result.ok) {
+    return {
+      session: null,
+      response: corsJson(request, { error: true, message: result.message }, { status: result.status }),
+    }
+  }
+  return { session: result.session, response: null }
+}
+
+/**
+ * Like requireAdmin but also admits the read-only `support` role. Used by the
+ * Support Desk page, which may inspect users/sessions/audit logs but never
+ * mutate anything. Better Auth's own admin plugin endpoints (list-users, etc.)
+ * reject non-admin roles, so the Support Desk relies on these custom read-only
+ * endpoints instead.
+ */
+async function requireSupportOrAdmin(request: Request) {
+  const ses = await getServerSession(request.headers)
+  const result = assertAdmin(ses)
+  if (!result.ok) {
+    // Fall back to the support role check (admin already failed).
+    const role = ses?.user?.role
+    if (role === 'support' && !ses?.session?.impersonatedBy && !ses?.user?.banned) {
+      return { session: ses, response: null }
+    }
     return {
       session: null,
       response: corsJson(request, { error: true, message: result.message }, { status: result.status }),
@@ -128,10 +153,57 @@ export const Route = createFileRoute('/api/v1/admin/$')({
           return withCors(await auth.handler(requestUrl(request)), request)
         }
 
-        const { response } = await requireAdmin(request)
+        const { response } = await requireSupportOrAdmin(request)
         if (response) return response
 
         const userId = url.searchParams.get('userId')
+
+        // Read-only user list for the Support Desk (support role cannot use
+        // Better Auth's admin plugin list-users endpoint, which is admin-only).
+        if (isUrlPath(url, 'support-users')) {
+          const page = parseInt(url.searchParams.get('page') || '0')
+          const limit = parseInt(url.searchParams.get('limit') || '20')
+          const offset = page * limit
+          const search = url.searchParams.get('search')?.trim()
+          try {
+            const where = search
+              ? sql`${schema.user.email} LIKE ${`%${search}%`}`
+              : undefined
+            const [totalResult] = await db
+              .select({ total: count() })
+              .from(schema.user)
+              .where(where)
+            const rows = await db
+              .select({
+                id: schema.user.id,
+                name: schema.user.name,
+                email: schema.user.email,
+                role: schema.user.role,
+                banned: schema.user.banned,
+                emailVerified: schema.user.emailVerified,
+                image: schema.user.image,
+                lastSeenAt: schema.user.lastSeenAt,
+                createdAt: schema.user.createdAt,
+              })
+              .from(schema.user)
+              .where(where)
+              .orderBy(desc(schema.user.createdAt))
+              .limit(limit)
+              .offset(offset)
+            return corsJson(
+              request,
+              { users: rows, total: totalResult.total },
+              { status: 200 },
+            )
+          } catch (error) {
+            logger.error('Failed to fetch support users', error, 'Admin')
+            return corsJson(
+              request,
+              { error: true, message: 'Failed to fetch users' },
+              { status: 500 },
+            )
+          }
+        }
 
         if (isUrlPath(url, 'accounts')) {
           if (!userId) {
@@ -159,6 +231,42 @@ export const Route = createFileRoute('/api/v1/admin/$')({
             return corsJson(
               request,
               { error: true, message: 'Failed to fetch accounts' },
+              { status: 500 },
+            )
+          }
+        }
+
+        // Per-user sessions for the Support Desk (read-only; support role
+        // cannot call Better Auth's admin listUserSessions endpoint).
+        if (isUrlPath(url, 'support-sessions')) {
+          if (!userId) {
+            return corsJson(
+              request,
+              { error: true, message: 'userId is required' },
+              { status: 400 },
+            )
+          }
+          try {
+            const rows = await db
+              .select({
+                id: schema.session.id,
+                userId: schema.session.userId,
+                ipAddress: schema.session.ipAddress,
+                userAgent: schema.session.userAgent,
+                impersonatedBy: schema.session.impersonatedBy,
+                createdAt: schema.session.createdAt,
+                expiresAt: schema.session.expiresAt,
+              })
+              .from(schema.session)
+              .where(eq(schema.session.userId, userId))
+              .orderBy(schema.session.createdAt)
+
+            return corsJson(request, { data: rows }, { status: 200 })
+          } catch (error) {
+            logger.error('Failed to fetch support sessions', error, 'Admin')
+            return corsJson(
+              request,
+              { error: true, message: 'Failed to fetch sessions' },
               { status: 500 },
             )
           }
@@ -525,51 +633,6 @@ export const Route = createFileRoute('/api/v1/admin/$')({
           }
         }
 
-        // OAuth providers — linked-account stats + recent links.
-        if (isUrlPath(url, 'oauth-providers')) {
-          try {
-            const providerStats = await db
-              .select({
-                provider: schema.account.providerId,
-                count: count(),
-              })
-              .from(schema.account)
-              .groupBy(schema.account.providerId)
-              .orderBy(desc(count()))
-
-            const linked = await db
-              .select({
-                id: schema.account.id,
-                provider: schema.account.providerId,
-                accountId: schema.account.accountId,
-                userId: schema.account.userId,
-                createdAt: schema.account.createdAt,
-                email: schema.user.email,
-                name: schema.user.name,
-              })
-              .from(schema.account)
-              .innerJoin(schema.user, eq(schema.account.userId, schema.user.id))
-              .where(ne(schema.account.providerId, 'credential'))
-              .orderBy(desc(schema.account.createdAt))
-              .limit(100)
-
-            return corsJson(
-              request,
-              {
-                providerStats,
-                linkedAccounts: linked,
-                totalLinked: providerStats
-                  .filter((p: { provider: string }) => p.provider !== 'credential')
-                  .reduce((sum: number, p: { count: number }) => sum + p.count, 0),
-              },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error('Failed to fetch OAuth providers', error, 'Admin')
-            return corsJson(request, { error: true, message: 'Failed to fetch OAuth providers' }, { status: 500 })
-          }
-        }
-
         // Hardware / system status
         if (isUrlPath(url, 'hardware')) {
           try {
@@ -806,28 +869,6 @@ export const Route = createFileRoute('/api/v1/admin/$')({
           } catch (error) {
             logger.error('Bulk action failed', error, 'Admin')
             return corsJson(request, { error: true, message: 'Bulk action failed' }, { status: 500 })
-          }
-        }
-
-        // Disable 2FA for a user
-        if (isUrlPath(url, 'disable-2fa')) {
-          const userId = body.userId as string | undefined
-          if (!userId) {
-            return corsJson(request, { error: true, message: 'userId is required' }, { status: 400 })
-          }
-          try {
-            await db.delete(schema.twoFactor).where(eq(schema.twoFactor.userId, userId))
-            await db.update(schema.user).set({ twoFactorEnabled: false }).where(eq(schema.user.id, userId))
-            await audit({
-              actorId: adminSession.session.userId,
-              action: 'user.disable-2fa',
-              targetId: userId,
-              request,
-            })
-            return corsJson(request, { success: true }, { status: 200 })
-          } catch (error) {
-            logger.error('Failed to disable 2FA', error, 'Admin')
-            return corsJson(request, { error: true, message: 'Failed to disable 2FA' }, { status: 500 })
           }
         }
 
