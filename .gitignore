@@ -1,0 +1,26 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.env
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+__unconfig*
+todos.json
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# SQLite databases (never commit binary DB / WAL / SHM files)
+*.db
+*.db-wal
+*.db-shm
+src/db/sqlite/
+
+# Throwaway debug scripts
+debug/
