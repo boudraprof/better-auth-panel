@@ -4,7 +4,6 @@ import type { ClassValue } from 'clsx'
 import {
   BarChart3,
   Gauge,
-  LifeBuoy,
   Mail,
   Radar,
   ScrollText,
@@ -53,7 +52,7 @@ export type NavItem = {
   to: string
   icon: typeof Gauge
   activeOptions?: LinkProps['activeOptions']
-  roles?: Array<'admin' | 'support' | 'user'>
+  roles?: Array<'admin' | 'user'>
 }
 
 export const NAV_ITEMS: Array<NavItem> = [
@@ -66,10 +65,9 @@ export const NAV_ITEMS: Array<NavItem> = [
   },
   { label: 'Audit Log', to: '/audit-log', icon: ScrollText, roles: ['admin'] },
   { label: 'Analytics', to: '/analytics', icon: BarChart3, roles: ['admin'] },
-  { label: 'Organizations', to: '/organizations', icon: Users, roles: ['admin', 'support', 'user'] },
+  { label: 'Organizations', to: '/organizations', icon: Users, roles: ['admin', 'user'] },
   { label: 'Hardware', to: '/hardware', icon: Radar, roles: ['admin'] },
   { label: 'Email', to: '/email-config', icon: Mail, roles: ['admin'] },
   { label: 'Rate Limits', to: '/rate-limits', icon: ShieldCheck, roles: ['admin'] },
-  { label: 'Support Desk', to: '/support-center', icon: LifeBuoy, roles: ['admin', 'support'] },
-  { label: 'My Account', to: '/profile', icon: UserCircle, roles: ['admin', 'support', 'user'] },
+  { label: 'My Account', to: '/profile', icon: UserCircle, roles: ['admin', 'user'] },
 ]

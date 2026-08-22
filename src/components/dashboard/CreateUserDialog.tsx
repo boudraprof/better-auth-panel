@@ -200,7 +200,6 @@ export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {
                   onValueChange={(v) => field.handleChange(v)}
                 >
                   <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </Select>
               </div>

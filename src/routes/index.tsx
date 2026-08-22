@@ -208,7 +208,7 @@ function AdminDashboard() {
     fetchUsers(0, searchValue)
   }
 
-  const handleSetRole = async (user: User, role: 'user' | 'support' | 'admin') => {
+  const handleSetRole = async (user: User, role: 'user' | 'admin') => {
     // Never let an admin strip their own admin role (self-lockout).
     if (user.id === currentUserId && role !== 'admin') {
       toast.error('You cannot remove your own admin role')

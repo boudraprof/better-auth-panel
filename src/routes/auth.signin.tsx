@@ -45,14 +45,12 @@ function SignIn() {
       }
       // Route middleware only runs on full page loads — a client-side
       // navigate() to '/' would render the dashboard before the admin check.
-      // Redirect by role: admins → dashboard, support → support desk, plain
-      // users → bounced back to sign-in with a clear message (the middleware
-      // stays as defense-in-depth for direct loads).
+      // Only admins may enter the panel; everyone else is bounced back to
+      // sign-in with a clear message (the middleware stays as defense-in-depth
+      // for direct loads).
       const role = res.data?.user.role
       if (role === 'admin') {
         router.navigate({ to: '/' })
-      } else if (role === 'support') {
-        router.navigate({ to: '/support-center' })
       } else {
         setErrorMessage('Access denied: this panel is admin-only.')
         logger.warn(`Non-admin sign-in rejected: ${res.data?.user.email}`, 'Auth')

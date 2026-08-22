@@ -248,7 +248,7 @@ function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                   <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="role" width={80} tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                  <Tooltip itemStyle={{color: "var(--card-foreground)"}}  contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                     {d.roleDistribution.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Bar>
@@ -271,7 +271,7 @@ function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                   <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                  <Tooltip itemStyle={{color: "var(--card-foreground)"}}  contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     <Cell fill="#10b981" />
                     <Cell fill="#f59e0b" />
@@ -292,7 +292,7 @@ function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                   <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                  <Tooltip itemStyle={{color: "var(--card-foreground)"}}  contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     {auditData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Bar>
@@ -315,7 +315,7 @@ function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                   <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                  <Tooltip  itemStyle={{color: "var(--card-foreground)"}} contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     <Cell fill="#4fb8b2" />
                     <Cell fill="#ef4444" />

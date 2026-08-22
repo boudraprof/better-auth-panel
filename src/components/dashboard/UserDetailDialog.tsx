@@ -128,17 +128,8 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     setSessionsLoading(true)
     setAccountsLoading(true)
     try {
-      // Support (read-only) staff cannot call Better Auth's admin
-      // listUserSessions endpoint, so they use the custom support-sessions
-      // endpoint instead. Admins use the native admin client.
-      const sessionsPromise = canManage
-        ? adminApi.listUserSessions({ userId: id }).then((r) => r.data?.sessions ?? [])
-        : api
-            .get<{ data: Array<Session> }>('/admin/support-sessions', { params: { userId: id } })
-            .then((r) => r.data.data)
-
       const [sessionsRes, accountsRes] = await Promise.all([
-        sessionsPromise,
+        adminApi.listUserSessions({ userId: id }).then((r) => r.data?.sessions ?? []),
         api.get<{ data: Array<Account> }>('/admin/accounts', { params: { userId: id } }),
       ])
       if (shownUserIdRef.current !== id) return

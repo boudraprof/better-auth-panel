@@ -8,7 +8,7 @@ import { corsJson, withCors } from '#/middleware/cors'
 import { getServerSession } from '#/utils/session'
 import { auth } from '#/utils/auth'
 import { requestUrl } from '#/utils/url'
-import { assertAdmin, assertStaff } from '#/utils/admin'
+import { assertAdmin } from '#/utils/admin'
 import { isUrlPath } from '#/utils/utils'
 import { audit } from '#/utils/audit'
 import logger from '#/utils/logger'
@@ -80,8 +80,6 @@ const ADMIN_CUSTOM_PATHS = new Set([
   '/api/v1/admin/organizations',
   '/api/v1/admin/organizations/members',
   '/api/v1/admin/organizations/delete',
-  '/api/v1/admin/support-users',
-  '/api/v1/admin/support-sessions',
 ])
 
 /**
@@ -97,24 +95,6 @@ const ADMIN_CUSTOM_PATHS = new Set([
 async function requireAdmin(request: Request) {
   const ses = await getServerSession(request.headers)
   const result = assertAdmin(ses)
-  if (!result.ok) {
-    return {
-      session: null,
-      response: corsJson(request, { error: true, message: result.message }, { status: result.status }),
-    }
-  }
-  return { session: result.session, response: null }
-}
-
-/**
- * Like {@link requireAdmin} but admits the `support` role as well (any staff
- * member). Used by the read-only GET endpoints that the Support Desk UI relies
- * on — support staff can view users, sessions, audit logs, analytics, orgs and
- * hardware but must never mutate anything (those POST paths stay admin-only).
- */
-async function requireSupportOrAdmin(request: Request) {
-  const ses = await getServerSession(request.headers)
-  const result = assertStaff(ses)
   if (!result.ok) {
     return {
       session: null,
@@ -147,57 +127,10 @@ export const Route = createFileRoute('/api/v1/admin/$')({
           return withCors(await auth.handler(requestUrl(request)), request)
         }
 
-        const { response } = await requireSupportOrAdmin(request)
+        const { response } = await requireAdmin(request)
         if (response) return response
 
         const userId = url.searchParams.get('userId')
-
-        // Read-only user list for the Support Desk (support role cannot use
-        // Better Auth's admin plugin list-users endpoint, which is admin-only).
-        if (isUrlPath(url, 'support-users')) {
-          const page = parseInt(url.searchParams.get('page') || '0')
-          const limit = parseInt(url.searchParams.get('limit') || '20')
-          const offset = page * limit
-          const search = url.searchParams.get('search')?.trim()
-          try {
-            const where = search
-              ? sql`${schema.user.email} LIKE ${`%${search}%`}`
-              : undefined
-            const [totalResult] = await db
-              .select({ total: count() })
-              .from(schema.user)
-              .where(where)
-            const rows = await db
-              .select({
-                id: schema.user.id,
-                name: schema.user.name,
-                email: schema.user.email,
-                role: schema.user.role,
-                banned: schema.user.banned,
-                emailVerified: schema.user.emailVerified,
-                image: schema.user.image,
-                lastSeenAt: schema.user.lastSeenAt,
-                createdAt: schema.user.createdAt,
-              })
-              .from(schema.user)
-              .where(where)
-              .orderBy(desc(schema.user.createdAt))
-              .limit(limit)
-              .offset(offset)
-            return corsJson(
-              request,
-              { users: rows, total: totalResult.total },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error('Failed to fetch support users', error, 'Admin')
-            return corsJson(
-              request,
-              { error: true, message: 'Failed to fetch users' },
-              { status: 500 },
-            )
-          }
-        }
 
         if (isUrlPath(url, 'accounts')) {
           if (!userId) {
@@ -225,42 +158,6 @@ export const Route = createFileRoute('/api/v1/admin/$')({
             return corsJson(
               request,
               { error: true, message: 'Failed to fetch accounts' },
-              { status: 500 },
-            )
-          }
-        }
-
-        // Per-user sessions for the Support Desk (read-only; support role
-        // cannot call Better Auth's admin listUserSessions endpoint).
-        if (isUrlPath(url, 'support-sessions')) {
-          if (!userId) {
-            return corsJson(
-              request,
-              { error: true, message: 'userId is required' },
-              { status: 400 },
-            )
-          }
-          try {
-            const rows = await db
-              .select({
-                id: schema.session.id,
-                userId: schema.session.userId,
-                ipAddress: schema.session.ipAddress,
-                userAgent: schema.session.userAgent,
-                impersonatedBy: schema.session.impersonatedBy,
-                createdAt: schema.session.createdAt,
-                expiresAt: schema.session.expiresAt,
-              })
-              .from(schema.session)
-              .where(eq(schema.session.userId, userId))
-              .orderBy(schema.session.createdAt)
-
-            return corsJson(request, { data: rows }, { status: 200 })
-          } catch (error) {
-            logger.error('Failed to fetch support sessions', error, 'Admin')
-            return corsJson(
-              request,
-              { error: true, message: 'Failed to fetch sessions' },
               { status: 500 },
             )
           }
@@ -828,15 +725,14 @@ export const Route = createFileRoute('/api/v1/admin/$')({
           }
         }
 
-        // Set a user's role (supports the custom `support` role, which the
-        // Better Auth admin client's setRole type does not allow).
+        // Set a user's role (admin or user).
         if (isUrlPath(url, 'set-role')) {
           const userId = body.userId as string | undefined
           const role = body.role as string | undefined
           if (!userId || !role) {
             return corsJson(request, { error: true, message: 'userId and role are required' }, { status: 400 })
           }
-          if (!['user', 'admin', 'support'].includes(role)) {
+          if (!['user', 'admin'].includes(role)) {
             return corsJson(request, { error: true, message: 'Invalid role' }, { status: 400 })
           }
           try {

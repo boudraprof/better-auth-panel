@@ -1,5 +1,5 @@
 import type { AuthSession } from '#/middleware/api'
-import { normalizeRole, hasPermission  } from '#/utils/permissions'
+import { hasPermission } from '#/utils/permissions'
 import type {Permission} from '#/utils/permissions';
 
 /**
@@ -40,33 +40,6 @@ export function assertAdmin(session: AuthSession | null): AdminCheckResult {
 
   if (sess.impersonatedBy) {
     return { ok: false, status: 403, message: 'Forbidden while impersonating' }
-  }
-
-  return { ok: true, session }
-}
-
-/**
- * Like {@link assertAdmin} but also admits the `support` role — i.e. anyone
- * allowed into the panel at all (admin or support). Rejects plain `user`s,
- * banned accounts, and impersonation sessions.
- */
-export function assertStaff(session: AuthSession | null): AdminCheckResult {
-  if (!session) {
-    return { ok: false, status: 401, message: 'Unauthorized' }
-  }
-
-  const { user, session: sess } = session
-
-  if (user.banned) {
-    return { ok: false, status: 403, message: 'Account banned' }
-  }
-
-  if (sess.impersonatedBy) {
-    return { ok: false, status: 403, message: 'Forbidden while impersonating' }
-  }
-
-  if (normalizeRole(user.role) === 'user') {
-    return { ok: false, status: 403, message: 'Forbidden' }
   }
 
   return { ok: true, session }

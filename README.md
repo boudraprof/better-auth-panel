@@ -24,7 +24,7 @@ Give your Better Auth app a fully-featured admin dashboard: manage users, sessio
 | 🚦 **Rate Limits UI** | Inspect and clear rate-limit state from the dashboard |
 | 🌐 **Global Sessions** | View and revoke all active sessions across the entire app |
 | 📖 **Interactive API Docs** | OpenAPI/Scalar reference at `/v1/api/reference` |
-| 🛡️ **RBAC** | `admin` (full), `support` (read-only staff), and `user` roles with granular server-side permission enforcement |
+| 🛡️ **RBAC** | `admin` (full) and `user` roles with granular server-side permission enforcement |
 | ⚡ **Better Auth Infra** | Optional dash analytics + sentinel abuse protection when `BETTER_AUTH_API_KEY` is set |
 
 ---

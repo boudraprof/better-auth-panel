@@ -4,8 +4,8 @@ import { getServerSession } from '#/utils/session'
 
 /**
  * Route-level middleware for pages that require any authenticated (non-banned)
- * session — including plain users, support staff, and admins. Impersonating
- * sessions are allowed so admins can preview the user-facing area.
+ * session — including plain users and admins. Impersonating sessions are
+ * allowed so admins can preview the user-facing area.
  */
 export const authedMiddleware = createMiddleware().server(async ({ next }) => {
   const session = await getServerSession()

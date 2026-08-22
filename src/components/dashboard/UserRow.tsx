@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { Ban, CheckCircle2, Eye, Loader2, Shield, ShieldAlert, ShieldOff } from 'lucide-react'
+import { Ban, CheckCircle2, Eye, Loader2, Shield, ShieldOff } from 'lucide-react'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
@@ -23,7 +23,7 @@ type Props = {
   selected: boolean
   onToggleSelect: () => void
   onViewDetails: (user: User) => void
-  onSetRole: (user: User, role: 'user' | 'support' | 'admin') => void
+  onSetRole: (user: User, role: 'user' | 'admin') => void
   onBan: (userId: string, reason?: string, expiresIn?: number) => void
   onUnban: (userId: string) => void
   /** When false, read-only rows hide selection + all mutating controls. */
@@ -94,8 +94,6 @@ export function UserRow({
             <span className="font-medium truncate">{user.name}</span>
             {user.role === 'admin' ? (
               <Shield className="size-4 text-amber-500 shrink-0" />
-            ) : user.role === 'support' ? (
-              <ShieldAlert className="size-4 text-blue-500 shrink-0" />
             ) : (
               <ShieldOff className="size-4 text-muted-foreground shrink-0" />
             )}
@@ -118,10 +116,9 @@ export function UserRow({
           <Select
             className="w-28 h-8 text-xs"
             value={user.role}
-            onValueChange={(val) => onSetRole(user, val as 'user' | 'support' | 'admin')}
+            onValueChange={(val) => onSetRole(user, val as 'user' | 'admin')}
           >
             <SelectItem value="user">User</SelectItem>
-            <SelectItem value="support">Support</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
           </Select>
         )}

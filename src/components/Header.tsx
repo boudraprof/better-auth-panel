@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { SidebarTrigger } from "#/components/ui/sidebar"
 import ThemeToggle from './ThemeToggle'
 import ServerStatus from './ServerStatus'

@@ -1,16 +1,12 @@
 /**
  * Central role & permission model for the admin panel.
  *
- * Beyond the binary admin/user the Better Auth admin plugin provides, we
- * introduce a `support` role: a read-only staff member who can inspect users,
- * sessions, orgs, audit logs and analytics but cannot mutate anything.
- *
  * Permissions are granular so the model can grow (e.g. a future "billing" role
  * with only `org:read` + `settings:email`). `admin` implicitly holds every
  * permission; enforcement helpers short-circuit on `admin`.
  */
 
-export type Role = 'admin' | 'support' | 'user'
+export type Role = 'admin' | 'user'
 
 export type Permission =
   | 'user:read'
@@ -33,11 +29,10 @@ export type Permission =
   | 'seed:users'
 
 /** Roles an admin can assign to another user from the UI. */
-export const ASSIGNABLE_ROLES: readonly Role[] = ['admin', 'support', 'user']
+export const ASSIGNABLE_ROLES: readonly Role[] = ['admin', 'user']
 
 export const ROLE_LABELS: Record<Role, string> = {
   admin: 'Admin',
-  support: 'Support',
   user: 'User',
 }
 
@@ -63,21 +58,12 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'ratelimit:clear',
     'seed:users',
   ],
-  support: [
-    'user:read',
-    'session:read',
-    'org:read',
-    'audit:read',
-    'analytics:read',
-    'hardware:read',
-    'ratelimit:read',
-  ],
   user: [],
 }
 
 /** Coerce an arbitrary string (from the DB) into a known role. */
 export function normalizeRole(role: string | null | undefined): Role {
-  return role === 'admin' || role === 'support' ? role : 'user'
+  return role === 'admin' ? 'admin' : 'user'
 }
 
 /** All permissions granted to a role (admin → every permission). */
