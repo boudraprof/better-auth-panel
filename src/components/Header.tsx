@@ -11,10 +11,6 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
-            <Link to="/" className="flex items-center gap-2 no-underline text-foreground">
-              <img src="/ap-icon.svg" alt="AP logo" className="size-7" />
-              <span className="text-base font-semibold">AP Admin Panel</span>
-            </Link>
           </div>
         </div>
         <div className="flex items-center gap-2">

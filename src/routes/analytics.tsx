@@ -7,7 +7,7 @@ import {
 import { toast } from 'react-toastify'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, AreaChart, Area,
+  Cell, AreaChart, Area,
 } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
@@ -238,78 +238,89 @@ function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        {/* Role distribution pie */}
+        {/* Role distribution horizontal bar */}
         <Card>
           <CardHeader><CardTitle>Users by Role</CardTitle></CardHeader>
           <CardContent>
             {d.roleDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
-                  <Pie data={d.roleDistribution} cx="50%" cy="50%" outerRadius={90} innerRadius={45} dataKey="count" nameKey="role" label={(entry: any) => `${entry.role}: ${entry.count}`} labelLine>
-                    {d.roleDistribution.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
+                <BarChart data={d.roleDistribution} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="role" width={80} tick={{ fontSize: 11 }} />
                   <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
-                </PieChart>
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                    {d.roleDistribution.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             ) : <p className="text-center text-muted-foreground py-8 text-sm">No data</p>}
           </CardContent>
         </Card>
 
-        {/* Verification status */}
+        {/* Verification status horizontal bar */}
         <Card>
           <CardHeader><CardTitle>Email Verification</CardTitle></CardHeader>
           <CardContent>
             {d.totalUsers > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
-                  <Pie data={[
-                    { name: 'Verified', value: d.verifiedUsers },
-                    { name: 'Unverified', value: d.unverifiedUsers },
-                  ]} cx="50%" cy="50%" outerRadius={90} innerRadius={45} dataKey="value" nameKey="name" label={(entry: any) => `${entry.name}: ${entry.value}`} labelLine>
+                <BarChart data={[
+                  { name: 'Verified', value: d.verifiedUsers },
+                  { name: 'Unverified', value: d.unverifiedUsers },
+                ]} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
+                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     <Cell fill="#10b981" />
                     <Cell fill="#f59e0b" />
-                  </Pie>
-                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
-                </PieChart>
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             ) : <p className="text-center text-muted-foreground py-8 text-sm">No data</p>}
           </CardContent>
         </Card>
 
-        {/* Audit breakdown pie */}
+        {/* Audit breakdown horizontal bar */}
         {auditData.length > 0 && (
           <Card>
             <CardHeader><CardTitle>Admin Actions</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
-                  <Pie data={auditData} cx="50%" cy="50%" outerRadius={90} innerRadius={45} dataKey="value" nameKey="name" label={({ name, value }) => `${name}: ${value}`} labelLine>
-                    {auditData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
+                <BarChart data={auditData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
                   <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
-                  <Legend />
-                </PieChart>
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                    {auditData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         )}
 
-        {/* Banned status */}
+        {/* Banned status horizontal bar */}
         {d.totalUsers > 0 && (
           <Card>
             <CardHeader><CardTitle>User Status</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
-                  <Pie data={[
-                    { name: 'Active', value: d.totalUsers - d.bannedUsers },
-                    { name: 'Banned', value: d.bannedUsers },
-                  ]} cx="50%" cy="50%" outerRadius={90} innerRadius={45} dataKey="value" nameKey="name" label={(entry: any) => `${entry.name}: ${entry.value}`} labelLine>
+                <BarChart data={[
+                  { name: 'Active', value: d.totalUsers - d.bannedUsers },
+                  { name: 'Banned', value: d.bannedUsers },
+                ]} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
+                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     <Cell fill="#4fb8b2" />
                     <Cell fill="#ef4444" />
-                  </Pie>
-                  <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }} />
-                </PieChart>
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
