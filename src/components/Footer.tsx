@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="border-t px-4 py-3 text-muted-foreground">
       <div className="flex items-center justify-between text-xs">
-        <p>&copy; {year} AP Admin Panel</p>
+        <p>&copy; {year} BP Admin Panel</p>
       </div>
     </footer>
   )

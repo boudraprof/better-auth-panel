@@ -30,7 +30,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'AP Admin Panel',
+        title: 'BP Admin Panel',
       },
     ],
     links: [
@@ -40,8 +40,8 @@ export const Route = createRootRoute({
       },
       {
         rel: 'icon',
-        type: 'image/x-icon',
-        href: '/favicon.ico',
+        type: 'image/svg+xml',
+        href: '/favicon.svg',
       },
       {
         rel: 'icon',

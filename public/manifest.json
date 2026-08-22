@@ -1,13 +1,8 @@
 {
-  "short_name": "AP",
-  "name": "AP Admin Panel",
+  "short_name": "BP",
+  "name": "BP Admin Panel",
   "description": "Admin panel for My Notes.",
   "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "512x512 192x192 128x128 64x64",
-      "type": "image/x-icon"
-    },
     {
       "src": "ap192.png",
       "type": "image/png",

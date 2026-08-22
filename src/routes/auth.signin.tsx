@@ -63,7 +63,7 @@ function SignIn() {
       <div className="absolute top-4 right-4"></div>
       <Card className="w-md max-sm:w-[90%]">
         <CardHeader className="flex flex-col items-center">
-          <img src="/ap128.png" alt="AP logo" className="size-10" />
+          <img src="/ap128.png" alt="BP logo" className="size-10" />
           <CardTitle className="text-lg md:text-xl">Admin Sign In</CardTitle>
           <CardDescription className="flex flex-col text-center text-xs md:text-sm">
             <p>Enter your email below to login to the admin panel</p>

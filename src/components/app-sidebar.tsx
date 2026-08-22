@@ -52,7 +52,7 @@ export function AppSidebar() {
               className="data-[active=true]:bg-transparent hover:bg-transparent"
             >
               <Link to="/" className="flex items-center gap-2 no-underline text-foreground">
-                <img src="/ap-icon.svg" alt="AP logo" className="size-7" />
+                <img src="/ap-icon.svg" alt="BP logo" className="size-7" />
                 <span className="text-base font-semibold">Better-auth Panel</span>
               </Link>
             </SidebarMenuButton>

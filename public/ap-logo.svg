@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 64" width="212" height="64" role="img" aria-labelledby="title">
-  <title id="title">AP</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 64" width="256" height="64" role="img" aria-labelledby="title">
+  <title id="title">BP</title>
   <defs>
     <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#2dd4bf"/>
@@ -15,13 +15,14 @@
   <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#sheen)"/>
   <rect x="4.75" y="4.75" width="54.5" height="54.5" rx="15.25" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.5"/>
   <g fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <!-- A -->
-    <path d="M18 44 L25 20 L32 44"/>
-    <path d="M20.5 35 L28 35"/>
+    <!-- B -->
+    <path d="M19 44 L19 20"/>
+    <path d="M19 20 C 32 20 32 32 19 32"/>
+    <path d="M19 32 C 32 32 32 44 19 44"/>
     <!-- P -->
     <path d="M35 44 L35 20 L44 20 A9 9 0 0 1 44 33 L35 33"/>
   </g>
   <text x="72" y="41" font-family="Inter, 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="25" font-weight="700" letter-spacing="-0.3">
-    <tspan fill="#0f172a">Admin</tspan><tspan fill="#0d9488" dx="3">Panel</tspan>
+    <tspan fill="#0f172a">Better</tspan><tspan fill="#0d9488" dx="3">Panel</tspan>
   </text>
 </svg>

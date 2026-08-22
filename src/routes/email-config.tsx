@@ -228,7 +228,7 @@ function EmailConfigPage() {
                   id="fromName"
                   value={fromName}
                   onChange={(e) => setFromName(e.target.value)}
-                  placeholder="AP Admin Panel"
+                  placeholder="BP Admin Panel"
                 />
               </div>
             </div>
