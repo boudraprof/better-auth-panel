@@ -9,27 +9,307 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RateLimitsRouteImport } from './routes/rate-limits'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as OrganizationsRouteImport } from './routes/organizations'
+import { Route as HardwareRouteImport } from './routes/hardware'
+import { Route as EmailConfigRouteImport } from './routes/email-config'
+import { Route as AuditLogRouteImport } from './routes/audit-log'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthSigninRouteImport } from './routes/auth.signin'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthForgotpasswordRouteImport } from './routes/auth.forgotpassword'
+import { Route as ApiV1AuthSplatRouteImport } from './routes/api.v1.auth.$'
+import { Route as ApiV1AdminSplatRouteImport } from './routes/api.v1.admin.$'
 
-export interface FileRoutesByFullPath {}
-export interface FileRoutesByTo {}
+const RateLimitsRoute = RateLimitsRouteImport.update({
+  id: '/rate-limits',
+  path: '/rate-limits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizationsRoute = OrganizationsRouteImport.update({
+  id: '/organizations',
+  path: '/organizations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HardwareRoute = HardwareRouteImport.update({
+  id: '/hardware',
+  path: '/hardware',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailConfigRoute = EmailConfigRouteImport.update({
+  id: '/email-config',
+  path: '/email-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuditLogRoute = AuditLogRouteImport.update({
+  id: '/audit-log',
+  path: '/audit-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSigninRoute = AuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotpasswordRoute = AuthForgotpasswordRouteImport.update({
+  id: '/auth/forgotpassword',
+  path: '/auth/forgotpassword',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AuthSplatRoute = ApiV1AuthSplatRouteImport.update({
+  id: '/api/v1/auth/$',
+  path: '/api/v1/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AdminSplatRoute = ApiV1AdminSplatRouteImport.update({
+  id: '/api/v1/admin/$',
+  path: '/api/v1/admin/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/audit-log': typeof AuditLogRoute
+  '/email-config': typeof EmailConfigRoute
+  '/hardware': typeof HardwareRoute
+  '/organizations': typeof OrganizationsRoute
+  '/profile': typeof ProfileRoute
+  '/rate-limits': typeof RateLimitsRoute
+  '/auth/forgotpassword': typeof AuthForgotpasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/api/v1/admin/$': typeof ApiV1AdminSplatRoute
+  '/api/v1/auth/$': typeof ApiV1AuthSplatRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/audit-log': typeof AuditLogRoute
+  '/email-config': typeof EmailConfigRoute
+  '/hardware': typeof HardwareRoute
+  '/organizations': typeof OrganizationsRoute
+  '/profile': typeof ProfileRoute
+  '/rate-limits': typeof RateLimitsRoute
+  '/auth/forgotpassword': typeof AuthForgotpasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/api/v1/admin/$': typeof ApiV1AdminSplatRoute
+  '/api/v1/auth/$': typeof ApiV1AuthSplatRoute
+}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/audit-log': typeof AuditLogRoute
+  '/email-config': typeof EmailConfigRoute
+  '/hardware': typeof HardwareRoute
+  '/organizations': typeof OrganizationsRoute
+  '/profile': typeof ProfileRoute
+  '/rate-limits': typeof RateLimitsRoute
+  '/auth/forgotpassword': typeof AuthForgotpasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/api/v1/admin/$': typeof ApiV1AdminSplatRoute
+  '/api/v1/auth/$': typeof ApiV1AuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/audit-log'
+    | '/email-config'
+    | '/hardware'
+    | '/organizations'
+    | '/profile'
+    | '/rate-limits'
+    | '/auth/forgotpassword'
+    | '/auth/reset-password'
+    | '/auth/signin'
+    | '/api/v1/admin/$'
+    | '/api/v1/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to:
+    | '/'
+    | '/analytics'
+    | '/audit-log'
+    | '/email-config'
+    | '/hardware'
+    | '/organizations'
+    | '/profile'
+    | '/rate-limits'
+    | '/auth/forgotpassword'
+    | '/auth/reset-password'
+    | '/auth/signin'
+    | '/api/v1/admin/$'
+    | '/api/v1/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/audit-log'
+    | '/email-config'
+    | '/hardware'
+    | '/organizations'
+    | '/profile'
+    | '/rate-limits'
+    | '/auth/forgotpassword'
+    | '/auth/reset-password'
+    | '/auth/signin'
+    | '/api/v1/admin/$'
+    | '/api/v1/auth/$'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {}
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  AuditLogRoute: typeof AuditLogRoute
+  EmailConfigRoute: typeof EmailConfigRoute
+  HardwareRoute: typeof HardwareRoute
+  OrganizationsRoute: typeof OrganizationsRoute
+  ProfileRoute: typeof ProfileRoute
+  RateLimitsRoute: typeof RateLimitsRoute
+  AuthForgotpasswordRoute: typeof AuthForgotpasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSigninRoute: typeof AuthSigninRoute
+  ApiV1AdminSplatRoute: typeof ApiV1AdminSplatRoute
+  ApiV1AuthSplatRoute: typeof ApiV1AuthSplatRoute
 }
 
-const rootRouteChildren: RootRouteChildren = {}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/rate-limits': {
+      id: '/rate-limits'
+      path: '/rate-limits'
+      fullPath: '/rate-limits'
+      preLoaderRoute: typeof RateLimitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizations': {
+      id: '/organizations'
+      path: '/organizations'
+      fullPath: '/organizations'
+      preLoaderRoute: typeof OrganizationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hardware': {
+      id: '/hardware'
+      path: '/hardware'
+      fullPath: '/hardware'
+      preLoaderRoute: typeof HardwareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-config': {
+      id: '/email-config'
+      path: '/email-config'
+      fullPath: '/email-config'
+      preLoaderRoute: typeof EmailConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/audit-log': {
+      id: '/audit-log'
+      path: '/audit-log'
+      fullPath: '/audit-log'
+      preLoaderRoute: typeof AuditLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signin': {
+      id: '/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof AuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgotpassword': {
+      id: '/auth/forgotpassword'
+      path: '/auth/forgotpassword'
+      fullPath: '/auth/forgotpassword'
+      preLoaderRoute: typeof AuthForgotpasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/auth/$': {
+      id: '/api/v1/auth/$'
+      path: '/api/v1/auth/$'
+      fullPath: '/api/v1/auth/$'
+      preLoaderRoute: typeof ApiV1AuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/admin/$': {
+      id: '/api/v1/admin/$'
+      path: '/api/v1/admin/$'
+      fullPath: '/api/v1/admin/$'
+      preLoaderRoute: typeof ApiV1AdminSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
+}
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  AuditLogRoute: AuditLogRoute,
+  EmailConfigRoute: EmailConfigRoute,
+  HardwareRoute: HardwareRoute,
+  OrganizationsRoute: OrganizationsRoute,
+  ProfileRoute: ProfileRoute,
+  RateLimitsRoute: RateLimitsRoute,
+  AuthForgotpasswordRoute: AuthForgotpasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSigninRoute: AuthSigninRoute,
+  ApiV1AdminSplatRoute: ApiV1AdminSplatRoute,
+  ApiV1AuthSplatRoute: ApiV1AuthSplatRoute,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()

@@ -42,7 +42,6 @@ const config = defineConfig({
   server: {
     host: '127.0.0.1',
     port: 8000,
-    allowedHosts: ['is.demoteam.ch'],
     watch: {
       // Playwright writes these dirs during e2e runs; watching them triggers
       // full page reloads that abort in-flight API requests mid-test.
