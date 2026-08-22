@@ -191,7 +191,7 @@ better-auth-panel/
 ├── e2e/                       # Playwright specs + global setup
 ├── drizzle/                   # Migration files
 ├── scripts/                   # make-admin and dev utilities
-├── server.mjs                 # Production server
+├── app-server.mjs             # Production server
 ├── Dockerfile                 # Multi-stage Docker build
 └── .env.example               # Environment variable reference
 ```

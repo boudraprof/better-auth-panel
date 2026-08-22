@@ -11,7 +11,7 @@
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview --port 8000",
-    "start": "node server.mjs",
+    "start": "node app-server.mjs",
     "make-admin": "npx tsx scripts/make-admin.ts",
     "typecheck": "tsc --noEmit",
     "test:vi:ui": "vitest --ui",

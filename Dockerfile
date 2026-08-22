@@ -36,9 +36,9 @@ WORKDIR /app
 # native binding matches the runtime image.
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/server.mjs ./server.mjs
+COPY --from=build /app/app-server.mjs ./app-server.mjs
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/public ./public
 EXPOSE 8000
 USER node
-CMD ["node", "server.mjs"]
+CMD ["node", "app-server.mjs"]
