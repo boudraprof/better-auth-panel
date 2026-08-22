@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import {
   ArrowDown,
   ArrowUp,
-  BarChart3,
   Download,
-  FileText,
   Loader2,
   MonitorSmartphone,
   RefreshCw,
@@ -210,8 +208,7 @@ function AdminDashboard() {
     fetchUsers(0, searchValue)
   }
 
-  const handleToggleAdmin = async (user: User) => {
-    const role = user.role === 'admin' ? ('user' as const) : ('admin' as const)
+  const handleSetRole = async (user: User, role: 'user' | 'support' | 'admin') => {
     // Never let an admin strip their own admin role (self-lockout).
     if (user.id === currentUserId && role !== 'admin') {
       toast.error('You cannot remove your own admin role')
@@ -228,7 +225,7 @@ function AdminDashboard() {
       return
     }
     try {
-      await adminApi.setRole({ userId: user.id, role })
+      await api.post('/admin/set-role', { userId: user.id, role })
       toast.success(`Role updated to ${role}`)
       fetchUsers(currentPage, searchValue)
     } catch {
@@ -486,7 +483,7 @@ function AdminDashboard() {
                   selected={selectedIds.has(user.id)}
                   onToggleSelect={() => toggleSelectUser(user.id)}
                   onViewDetails={setSelectedUser}
-                  onToggleAdmin={handleToggleAdmin}
+                  onSetRole={handleSetRole}
                   onBan={handleBanUser}
                   onUnban={handleUnbanUser}
                 />

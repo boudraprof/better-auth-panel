@@ -37,7 +37,7 @@ function SupportCenter() {
   const [loading, setLoading] = useState(true)
   const [searchValue, setSearchValue] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
-  const [pageSize, setPageSize] = useState(20)
+  const [pageSize] = useState(20)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const fetchUsers = useCallback(async (page: number, search?: string) => {

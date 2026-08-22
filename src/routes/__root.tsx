@@ -2,7 +2,6 @@ import {
   HeadContent,
   Scripts,
   createRootRoute,
-  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -31,7 +30,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Admin Panel',
+        title: 'AP Admin Panel',
       },
     ],
     links: [
@@ -48,12 +47,12 @@ export const Route = createRootRoute({
         rel: 'icon',
         type: 'image/png',
         sizes: '128x128',
-        href: '/logo128.png',
+        href: '/ap128.png',
       },
       {
         rel: 'apple-touch-icon',
         sizes: '512x512',
-        href: '/logo512.png',
+        href: '/ap512.png',
       },
       {
         rel: 'manifest',

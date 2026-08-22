@@ -157,7 +157,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
           }),
         ),
       )
-      setAccounts(accountsRes.data)
+      setAccounts(accountsRes.data.data)
     } catch {
       if (shownUserIdRef.current === id) toast.error('Failed to fetch user details')
     } finally {

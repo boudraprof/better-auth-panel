@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 64" width="212" height="64" role="img" aria-labelledby="title">
   <title id="title">AP</title>
   <defs>
     <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
@@ -21,4 +21,7 @@
     <!-- P -->
     <path d="M35 44 L35 20 L44 20 A9 9 0 0 1 44 33 L35 33"/>
   </g>
+  <text x="72" y="41" font-family="Inter, 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="25" font-weight="700" letter-spacing="-0.3">
+    <tspan fill="#0f172a">Admin</tspan><tspan fill="#0d9488" dx="3">Panel</tspan>
+  </text>
 </svg>

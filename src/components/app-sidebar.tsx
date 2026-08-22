@@ -52,8 +52,8 @@ export function AppSidebar() {
               className="data-[active=true]:bg-transparent hover:bg-transparent"
             >
               <Link to={userRole === 'support' ? '/support-center' : '/'} className="flex items-center gap-2 no-underline text-foreground">
-                <img src="/favicon.svg" alt="Logo" className="size-7" />
-                <span className="text-base font-semibold">Better-auth panel</span>
+                <img src="/ap-icon.svg" alt="AP logo" className="size-7" />
+                <span className="text-base font-semibold">AP Admin Panel</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

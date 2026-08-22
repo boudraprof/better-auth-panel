@@ -47,7 +47,7 @@ function ForgotPassword() {
     <div className="flex justify-center items-center h-full relative">
       <Card className="w-md max-sm:w-[90%]">
         <CardHeader className="flex flex-col items-center">
-          <img src="/logo128.png" alt="Logo" className="size-10" />
+          <img src="/ap128.png" alt="AP logo" className="size-10" />
           <CardTitle className="text-lg md:text-xl">Forgot password</CardTitle>
           <CardDescription className="flex flex-col text-center text-xs md:text-sm">
             <p>Enter your email and we'll send you a reset link if an account exists.</p>

@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto'
 import { createFileRoute } from '@tanstack/react-router'
-import { and, count, desc, eq, gte, inArray, ne, sql } from 'drizzle-orm'
+import { and, count, desc, eq, gte, inArray, sql } from 'drizzle-orm'
 import { cpus, freemem, hostname, loadavg, totalmem, uptime } from 'node:os'
 
 import { db, schema } from '#/utils/config'
@@ -8,7 +8,7 @@ import { corsJson, withCors } from '#/middleware/cors'
 import { getServerSession } from '#/utils/session'
 import { auth } from '#/utils/auth'
 import { requestUrl } from '#/utils/url'
-import { assertAdmin } from '#/utils/admin'
+import { assertAdmin, assertStaff } from '#/utils/admin'
 import { isUrlPath } from '#/utils/utils'
 import { audit } from '#/utils/audit'
 import logger from '#/utils/logger'
@@ -69,10 +69,10 @@ const ADMIN_CUSTOM_PATHS = new Set([
   '/api/v1/admin/audit-logs',
   '/api/v1/admin/analytics',
   '/api/v1/admin/email-verify',
+  '/api/v1/admin/set-role',
   '/api/v1/admin/bulk-actions',
   '/api/v1/admin/export-users',
   '/api/v1/admin/hardware',
-  '/api/v1/admin/disable-2fa',
   '/api/v1/admin/user-activity',
   '/api/v1/admin/email-config',
   '/api/v1/admin/email-config/test',
@@ -107,21 +107,15 @@ async function requireAdmin(request: Request) {
 }
 
 /**
- * Like requireAdmin but also admits the read-only `support` role. Used by the
- * Support Desk page, which may inspect users/sessions/audit logs but never
- * mutate anything. Better Auth's own admin plugin endpoints (list-users, etc.)
- * reject non-admin roles, so the Support Desk relies on these custom read-only
- * endpoints instead.
+ * Like {@link requireAdmin} but admits the `support` role as well (any staff
+ * member). Used by the read-only GET endpoints that the Support Desk UI relies
+ * on — support staff can view users, sessions, audit logs, analytics, orgs and
+ * hardware but must never mutate anything (those POST paths stay admin-only).
  */
 async function requireSupportOrAdmin(request: Request) {
   const ses = await getServerSession(request.headers)
-  const result = assertAdmin(ses)
+  const result = assertStaff(ses)
   if (!result.ok) {
-    // Fall back to the support role check (admin already failed).
-    const role = ses?.user?.role
-    if (role === 'support' && !ses?.session?.impersonatedBy && !ses?.user?.banned) {
-      return { session: ses, response: null }
-    }
     return {
       session: null,
       response: corsJson(request, { error: true, message: result.message }, { status: result.status }),
@@ -831,6 +825,33 @@ export const Route = createFileRoute('/api/v1/admin/$')({
           } catch (error) {
             logger.error('Failed to update email verification', error, 'Admin')
             return corsJson(request, { error: true, message: 'Failed to update email verification' }, { status: 500 })
+          }
+        }
+
+        // Set a user's role (supports the custom `support` role, which the
+        // Better Auth admin client's setRole type does not allow).
+        if (isUrlPath(url, 'set-role')) {
+          const userId = body.userId as string | undefined
+          const role = body.role as string | undefined
+          if (!userId || !role) {
+            return corsJson(request, { error: true, message: 'userId and role are required' }, { status: 400 })
+          }
+          if (!['user', 'admin', 'support'].includes(role)) {
+            return corsJson(request, { error: true, message: 'Invalid role' }, { status: 400 })
+          }
+          try {
+            await auth.api.setRole({ headers: request.headers, body: { userId, role: role as 'user' | 'admin' } })
+            await audit({
+              actorId: adminSession.session.userId,
+              action: 'user.set-role',
+              targetId: userId,
+              metadata: { role },
+              request,
+            })
+            return corsJson(request, { success: true }, { status: 200 })
+          } catch (error) {
+            logger.error('Failed to set role', error, 'Admin')
+            return corsJson(request, { error: true, message: 'Failed to set role' }, { status: 500 })
           }
         }
 

@@ -45,11 +45,14 @@ function SignIn() {
       }
       // Route middleware only runs on full page loads — a client-side
       // navigate() to '/' would render the dashboard before the admin check.
-      // Redirect by role so non-admins are bounced back to sign-in with a
-      // clear message (the middleware stays as defense-in-depth for direct
-      // loads).
-      if (res.data?.user.role === 'admin') {
+      // Redirect by role: admins → dashboard, support → support desk, plain
+      // users → bounced back to sign-in with a clear message (the middleware
+      // stays as defense-in-depth for direct loads).
+      const role = res.data?.user.role
+      if (role === 'admin') {
         router.navigate({ to: '/' })
+      } else if (role === 'support') {
+        router.navigate({ to: '/support-center' })
       } else {
         setErrorMessage('Access denied: this panel is admin-only.')
         logger.warn(`Non-admin sign-in rejected: ${res.data?.user.email}`, 'Auth')
@@ -62,7 +65,7 @@ function SignIn() {
       <div className="absolute top-4 right-4"></div>
       <Card className="w-md max-sm:w-[90%]">
         <CardHeader className="flex flex-col items-center">
-          <img src="/logo128.png" alt="Logo" className="size-10" />
+          <img src="/ap128.png" alt="AP logo" className="size-10" />
           <CardTitle className="text-lg md:text-xl">Admin Sign In</CardTitle>
           <CardDescription className="flex flex-col text-center text-xs md:text-sm">
             <p>Enter your email below to login to the admin panel</p>
