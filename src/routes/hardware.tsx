@@ -11,27 +11,37 @@ import api from '#/utils/axios'
 type HardwareData = {
   hostname: string
   platform: string
+  distro?: string
+  release?: string
+  kernel?: string
   arch: string
   nodeVersion: string
   uptime: { days: number; hours: number; minutes: number; seconds: number }
   cpu: {
     model: string
+    manufacturer?: string
     cores: number
-    loadAvg: { '1m': number; '5m': number; '15m': number }
+    physicalCores?: number
+    speed?: number
     loadPercent: number
+    userPercent?: number
+    systemPercent?: number
   }
   memory: {
     total: number
     used: number
     free: number
+    available?: number
     percent: number
   }
   disk: {
+    filesystem?: string
+    mount?: string
     total: number
-    free: number
     used: number
+    free: number
     percent: number
-  }
+  } | null
 }
 
 export const Route = createFileRoute('/hardware')({
@@ -142,6 +152,18 @@ function HardwarePage() {
               <span className="text-muted-foreground">Platform</span>
               <p className="font-medium">{data.platform} {data.arch}</p>
             </div>
+            {data.distro && (
+              <div>
+                <span className="text-muted-foreground">Distro</span>
+                <p className="font-medium">{data.distro} {data.release}</p>
+              </div>
+            )}
+            {data.kernel && (
+              <div>
+                <span className="text-muted-foreground">Kernel</span>
+                <p className="font-medium">{data.kernel}</p>
+              </div>
+            )}
             <div>
               <span className="text-muted-foreground">Node.js</span>
               <p className="font-medium">{data.nodeVersion}</p>
@@ -172,8 +194,16 @@ function HardwarePage() {
               <p className="font-medium truncate" title={data.cpu.model}>{data.cpu.model}</p>
             </div>
             <div>
+              <span className="text-muted-foreground">Manufacturer</span>
+              <p className="font-medium truncate" title={data.cpu.manufacturer}>{data.cpu.manufacturer ?? 'N/A'}</p>
+            </div>
+            <div>
               <span className="text-muted-foreground">Cores</span>
-              <p className="font-medium">{data.cpu.cores}</p>
+              <p className="font-medium">{data.cpu.cores}{data.cpu.physicalCores ? ` (${data.cpu.physicalCores} phys)` : ''}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Speed</span>
+              <p className="font-medium">{data.cpu.speed ? `${data.cpu.speed} GHz` : 'N/A'}</p>
             </div>
           </div>
           <Gauge
@@ -182,10 +212,9 @@ function HardwarePage() {
             percent={data.cpu.loadPercent}
             color={data.cpu.loadPercent > 80 ? '#ef4444' : data.cpu.loadPercent > 50 ? '#f59e0b' : '#4fb8b2'}
           />
-          <div className="grid grid-cols-3 gap-4 text-xs text-muted-foreground">
-            <div>1m: {data.cpu.loadAvg['1m'].toFixed(2)}</div>
-            <div>5m: {data.cpu.loadAvg['5m'].toFixed(2)}</div>
-            <div>15m: {data.cpu.loadAvg['15m'].toFixed(2)}</div>
+          <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
+            <div>User: {data.cpu.userPercent ?? 0}%</div>
+            <div>System: {data.cpu.systemPercent ?? 0}%</div>
           </div>
         </CardContent>
       </Card>
@@ -208,18 +237,22 @@ function HardwarePage() {
           <div className="grid grid-cols-3 gap-4 mt-3 text-xs text-muted-foreground">
             <div>Total: {formatBytes(data.memory.total)}</div>
             <div>Used: {formatBytes(data.memory.used)}</div>
-            <div>Free: {formatBytes(data.memory.free)}</div>
-          </div>
+            <div>Free: {formatBytes(data.memory.free)}</div>              {data.memory.available !== undefined && (
+                <div>Available: {formatBytes(data.memory.available)}</div>
+              )}          </div>
         </CardContent>
       </Card>
 
       {/* Disk */}
-      {data.disk.total > 0 && (
+      {data.disk && data.disk.total > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HardDrive className="size-5 text-cyan-500" />
               Disk
+              {data.disk.mount && (
+                <span className="text-xs font-normal text-muted-foreground">{data.disk.mount}</span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -233,6 +266,9 @@ function HardwarePage() {
               <div>Total: {formatBytes(data.disk.total)}</div>
               <div>Used: {formatBytes(data.disk.used)}</div>
               <div>Free: {formatBytes(data.disk.free)}</div>
+              {data.disk.filesystem && (
+                <div className="col-span-3">Filesystem: {data.disk.filesystem}</div>
+              )}
             </div>
           </CardContent>
         </Card>
