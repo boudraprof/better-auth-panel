@@ -53,7 +53,7 @@ export function AppSidebar() {
               className="data-[active=true]:bg-transparent hover:bg-transparent"
             >
               <Link to="/" className="flex items-center gap-2 no-underline text-foreground">
-                <img src="/bp-icon.svg" alt="BP logo" className="size-7" />
+                <img src="/bp-icon.svg" alt="BA logo" className="size-7" />
                 <span className="text-base font-semibold">{APP_NAME}</span>
                 <span
                   title="This app is in beta — features may change."

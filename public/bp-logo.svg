@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 64" width="256" height="64" role="img" aria-labelledby="title">
-  <title id="title">BP</title>
+  <title id="title">BA admin panel</title>
   <defs>
     <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#2dd4bf"/>
@@ -19,10 +19,11 @@
     <path d="M19 44 L19 20"/>
     <path d="M19 20 C 32 20 32 32 19 32"/>
     <path d="M19 32 C 32 32 32 44 19 44"/>
-    <!-- P -->
-    <path d="M35 44 L35 20 L44 20 A9 9 0 0 1 44 33 L35 33"/>
+    <!-- A -->
+    <path d="M35 44 L44 20 L53 44"/>
+    <path d="M39.5 32 L48.5 32"/>
   </g>
   <text x="72" y="41" font-family="Inter, 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="25" font-weight="700" letter-spacing="-0.3">
-    <tspan fill="#0f172a">Better</tspan><tspan fill="#0d9488" dx="3">Panel</tspan>
+    <tspan fill="#0f172a">BA</tspan><tspan fill="#0d9488" dx="3">admin panel</tspan>
   </text>
 </svg>

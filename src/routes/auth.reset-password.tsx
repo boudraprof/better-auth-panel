@@ -37,7 +37,7 @@ function ResetPassword() {
       <div className="flex justify-center items-center h-full">
         <Card className="w-md max-sm:w-[90%]">
           <CardHeader className="flex flex-col items-center">
-            <img src="/bp128.png" alt="BP logo" className="size-10" />
+            <img src="/bp128.png" alt="BA logo" className="size-10" />
             <CardTitle>Invalid Reset Link</CardTitle>
             <CardDescription className="text-center">
               This password reset link is invalid or has expired. Please request a new one.
@@ -84,7 +84,7 @@ function ResetPassword() {
       </div>
       <Card className="w-md max-sm:w-[90%]">
         <CardHeader className="flex flex-col items-center">
-          <img src="/bp128.png" alt="BP logo" className="size-10" />
+          <img src="/bp128.png" alt="BA logo" className="size-10" />
           <CardTitle>Reset Password</CardTitle>
           <CardDescription className="text-center">Enter your new password below.</CardDescription>
         </CardHeader>
