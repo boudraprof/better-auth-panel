@@ -164,7 +164,7 @@ dashboard, analytics, audit log, organizations, etc. without changing any data.
 
 ### Try the live demo
 
-A read-only instance is deployed at `https://better-auth-panel.vercel.app/`. Sign in with the
+A read-only instance is deployed at [https://better-auth-panel.vercel.app/](https://better-auth-panel.vercel.app/). Sign in with the
 shared demo account — all changes are disabled, so explore freely:
 
 | Email | Password |
