@@ -50,6 +50,13 @@ Give your Better Auth app a fully-featured admin dashboard: manage users, sessio
 - **npm**, pnpm, or yarn
 - **PostgreSQL** — for production/staging; or use the built-in **SQLite** driver for zero-setup local development
 
+### Clone
+
+```bash
+git clone https://github.com/boudraprof/better-auth-panel.git
+cd better-auth-panel
+```
+
 ### 1. Install dependencies
 
 ```bash
