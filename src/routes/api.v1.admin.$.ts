@@ -11,6 +11,7 @@ import { requestUrl } from '#/utils/url'
 import { assertAdmin } from '#/utils/admin'
 import { isUrlPath } from '#/utils/utils'
 import { audit } from '#/utils/audit'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import logger from '#/utils/logger'
 
 /**
@@ -1065,6 +1066,18 @@ export const Route = createFileRoute('/api/v1/admin/$')({
         const body = (await request
           .json()
           .catch(() => ({}))) as Record<string, unknown>
+
+        // Demo mode: reject every mutating custom admin endpoint. The only
+        // POST endpoint that is read-only (it just queries the audit log) is
+        // `user-activity`, which we deliberately allow so the demo stays
+        // browseable. Everything else writes to the database.
+        if (isDemoMode() && !isUrlPath(url, 'user-activity')) {
+          return corsJson(
+            request,
+            { error: true, message: DEMO_MODE_MESSAGE },
+            { status: 403 },
+          )
+        }
 
         /*
          * Toggle email verification

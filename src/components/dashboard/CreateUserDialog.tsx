@@ -18,6 +18,7 @@ import {
 import { Select, SelectItem } from '#/components/ui/select'
 import api from '#/utils/axios'
 import { authClient } from '#/utils/auth-client'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import InputError from '#/components/InputError'
 
 const { admin: adminApi } = authClient
@@ -27,6 +28,11 @@ export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {
   const [emailTaken, setEmailTaken] = useState<boolean | null>(null)
   const [checkingEmail, setCheckingEmail] = useState(false)
   const checkSeq = useRef(0)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const form = useForm({
     defaultValues: {
@@ -36,6 +42,10 @@ export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {
       role: 'user',
     },
     onSubmit: async ({ value }) => {
+      if (demoMode) {
+        showDemoModeMessage()
+        return
+      }
       const email = value.email.trim()
       const { data } = await api.post<{ exists: boolean }>('/admin/check-email', { email })
       if (data.exists) {

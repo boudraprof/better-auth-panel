@@ -38,6 +38,7 @@ import { UserRow } from '#/components/dashboard/UserRow'
 import type { AdminStats, User } from '#/components/dashboard/types'
 import api from '#/utils/axios'
 import { useSession, authClient } from '#/utils/auth-client'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 
 const { admin: adminApi } = authClient
 
@@ -113,6 +114,11 @@ function AdminDashboard() {
   // self-destructive actions (ban / delete / remove own admin / revoke own
   // session).
   const currentUserId = sessionData?.user.id ?? null
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const fetchUsers = useCallback(async (page: number, search?: string) => {
     setLoading(true)
@@ -209,6 +215,11 @@ function AdminDashboard() {
   }
 
   const handleSetRole = async (user: User, role: 'user' | 'admin') => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     // Never let an admin strip their own admin role (self-lockout).
     if (user.id === currentUserId && role !== 'admin') {
       toast.error('You cannot remove your own admin role')
@@ -234,6 +245,11 @@ function AdminDashboard() {
   }
 
   const handleBanUser = async (userId: string, reason?: string, expiresIn?: number) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     // Never ban yourself.
     if (userId === currentUserId) {
       toast.error('You cannot ban yourself')
@@ -253,6 +269,11 @@ function AdminDashboard() {
   }
 
   const handleUnbanUser = async (userId: string) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     try {
       await adminApi.unbanUser({ userId })
       toast.success('User unbanned')
@@ -291,6 +312,11 @@ function AdminDashboard() {
   }
 
   const handleBulkAction = async (action: BulkAction) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     if (selectedIds.size === 0) {
       toast.error('No users selected')
       return

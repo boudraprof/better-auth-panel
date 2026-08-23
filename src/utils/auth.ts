@@ -9,8 +9,48 @@ import { APIError, betterAuth } from 'better-auth'
 import { trustedOrigins } from '#/utils/env'
 import { db, dbDriver, schema } from '#/utils/config'
 import { audit } from '#/utils/audit'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import { sendEmail } from '#/utils/email'
 import { ac, roles } from '#/utils/org-access'
+
+// Every Better Auth endpoint that mutates persistent data. In demo mode all
+// of these are rejected with a 403 before they touch the database. Reads
+// (GET) such as list-users / get-user / list-members are intentionally NOT
+// included so the demo stays fully browseable.
+const DEMO_BLOCKED_PATHS = new Set([
+  // Better Auth admin plugin mutations
+  '/admin/ban-user',
+  '/admin/create-user',
+  '/admin/impersonate-user',
+  '/admin/remove-user',
+  '/admin/revoke-user-session',
+  '/admin/revoke-user-sessions',
+  '/admin/set-role',
+  '/admin/set-user-password',
+  '/admin/stop-impersonating',
+  '/admin/unban-user',
+  '/admin/update-user',
+  // User self-service profile mutations
+  '/update-user',
+  '/change-email',
+  '/change-password',
+  '/delete-user',
+  '/set-password',
+  '/link-account',
+  '/unlink-account',
+  // Organization plugin mutations
+  '/organization/create',
+  '/organization/delete',
+  '/organization/update',
+  '/organization/set-active',
+  '/organization/remove-member',
+  '/organization/update-member-role',
+  '/organization/leave',
+  '/organization/invite-member',
+  '/organization/cancel-invitation',
+  '/organization/accept-invitation',
+  '/organization/reject-invitation',
+])
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_BASE_URL,
@@ -250,6 +290,12 @@ export const auth = betterAuth({
   ],
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
+      if (isDemoMode() && DEMO_BLOCKED_PATHS.has(ctx.path)) {
+        throw new APIError('FORBIDDEN', {
+          message: DEMO_MODE_MESSAGE,
+        })
+      }
+
       if (ctx.path === '/sign-up/email') {
         const requesterRole = ctx.context.session?.user?.role
         const isAdmin = requesterRole === 'admin'

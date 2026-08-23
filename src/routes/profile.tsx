@@ -34,6 +34,7 @@ import {
 } from '#/components/ui/dialog'
 import { authedMiddleware } from '#/middleware/authed'
 import { useSession, authClient } from '#/utils/auth-client'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import { normalizeRole } from '#/utils/permissions'
 import InputError from '#/components/InputError'
 
@@ -64,11 +65,21 @@ function ProfilePage() {
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   // Profile (name + image) form.
   const profileForm = useForm({
     defaultValues: { name: user?.name ?? '', image: user?.image ?? '' },
     onSubmit: async ({ value }) => {
+      if (demoMode) {
+        showDemoModeMessage()
+        return
+      }
+
       const data: Record<string, string> = {}
       if (value.name.trim() && value.name.trim() !== user?.name)
         data.name = value.name.trim()
@@ -90,6 +101,11 @@ function ProfilePage() {
   const passwordForm = useForm({
     defaultValues: { currentPassword: '', newPassword: '', confirm: '' },
     onSubmit: async ({ value }) => {
+      if (demoMode) {
+        showDemoModeMessage()
+        return
+      }
+
       const res = await changePassword({
         currentPassword: value.currentPassword,
         newPassword: value.newPassword,
@@ -108,6 +124,11 @@ function ProfilePage() {
   const emailForm = useForm({
     defaultValues: { newEmail: '' },
     onSubmit: async ({ value }) => {
+      if (demoMode) {
+        showDemoModeMessage()
+        return
+      }
+
       const res = await changeEmail({
         newEmail: value.newEmail.trim(),
         callbackURL: '/profile',
@@ -122,6 +143,12 @@ function ProfilePage() {
   })
 
   const handleDelete = async (password: string) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      setDeleteOpen(false)
+      return
+    }
+
     setDeleting(true)
     try {
       const res = await deleteUser({
@@ -459,7 +486,16 @@ function ProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (demoMode) {
+                showDemoModeMessage()
+                return
+              }
+              setDeleteOpen(true)
+            }}
+          >
             <Trash2 className="size-4" />
             Delete my account
           </Button>

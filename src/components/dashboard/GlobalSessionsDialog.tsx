@@ -10,6 +10,7 @@ import {
 } from '#/components/ui/dialog'
 import type { GlobalSession } from './types'
 import api from '#/utils/axios'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 
 type UserAgentInfo = { browser: string; os: string; mobile: boolean }
 
@@ -51,6 +52,11 @@ export function GlobalSessionsDialog({ open, onOpenChange, canRevoke = true }: P
   const [sessions, setSessions] = useState<Array<GlobalSession>>([])
   const [loading, setLoading] = useState(false)
   const [revokingId, setRevokingId] = useState<string | null>(null)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const fetchSessions = useCallback(async () => {
     setLoading(true)
@@ -70,6 +76,10 @@ export function GlobalSessionsDialog({ open, onOpenChange, canRevoke = true }: P
   }, [open, fetchSessions])
 
   const handleRevoke = async (sessionId: string) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     setRevokingId(sessionId)
     try {
       await api.post('/admin/sessions/revoke', { sessionId })

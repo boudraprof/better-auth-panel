@@ -47,5 +47,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
     cwd: '.',
+    // Run e2e against a writable panel so specs validate real behavior
+    // rather than the demo's read-only guards.
+    env: { ...process.env, DEMO_MODE: 'false' },
   },
 })

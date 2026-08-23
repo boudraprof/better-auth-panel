@@ -16,6 +16,7 @@ import {
 } from '#/components/ui/select'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 
 type EmailConfig = {
   id: string
@@ -39,6 +40,11 @@ function EmailConfigPage() {
   const [config, setConfig] = useState<EmailConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   // Form fields
   const [provider, setProvider] = useState('smtp')
@@ -76,6 +82,10 @@ function EmailConfigPage() {
   }, [fetchConfig])
 
   const handleSave = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     setSaving(true)
     try {
       await api.post('/admin/email-config', {
@@ -97,6 +107,10 @@ function EmailConfigPage() {
   }
 
   const handleTest = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     const testEmail = prompt('Send test email to:')
     if (!testEmail || !testEmail.includes('@')) return
     try {

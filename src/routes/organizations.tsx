@@ -18,6 +18,7 @@ import {
 } from '#/components/ui/dialog'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 
 type Organization = {
   id: string
@@ -59,6 +60,11 @@ function OrganizationsPage() {
   const [membersOrg, setMembersOrg] = useState<Organization | null>(null)
   const [members, setMembers] = useState<OrgMember[]>([])
   const [membersLoading, setMembersLoading] = useState(false)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const fetchOrgs = useCallback(async () => {
     setLoading(true)
@@ -93,6 +99,10 @@ function OrganizationsPage() {
   }
 
   const handleDelete = async (org: Organization) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     setDeletingId(org.id)
     try {
       await api.post('/admin/organizations/delete', { orgId: org.id })

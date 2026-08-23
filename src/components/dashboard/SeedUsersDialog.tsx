@@ -14,13 +14,23 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import api from '#/utils/axios'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 
 export function SeedUsersDialog({ onSeeded }: { onSeeded: () => void }) {
   const [open, setOpen] = useState(false)
   const [count, setCount] = useState(5)
   const [seeding, setSeeding] = useState(false)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const handleSeed = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     if (count < 1 || count > 100) {
       toast.error('Count must be between 1 and 100')
       return

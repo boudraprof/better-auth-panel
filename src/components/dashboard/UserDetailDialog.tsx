@@ -30,6 +30,7 @@ import {
 import type { Account, Session, User } from './types'
 import api from '#/utils/axios'
 import { useSession, authClient } from '#/utils/auth-client'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import InputError from '#/components/InputError'
 
 const { admin: adminApi } = authClient
@@ -53,6 +54,11 @@ type Props = {
 export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, canManage = true }: Props) {
   const { data: sessionData } = useSession()
   const currentUserId = sessionData?.user.id ?? null
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const [sessions, setSessions] = useState<Array<Session>>([])
   const [sessionsLoading, setSessionsLoading] = useState(false)
@@ -76,6 +82,11 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     defaultValues: { newPassword: '' },
     onSubmit: async ({ value }) => {
       if (!user) return
+      if (demoMode) {
+        showDemoModeMessage()
+        return
+      }
+
       const newPassword = value.newPassword
       if (!newPassword.trim()) return
       if (newPassword.length < 8) return
@@ -100,6 +111,11 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     },
     onSubmit: async ({ value }) => {
       if (!user) return
+      if (demoMode) {
+        showDemoModeMessage()
+        return
+      }
+
       const data: Record<string, string> = {}
       if (value.name.trim() && value.name.trim() !== user.name) data.name = value.name.trim()
       if (value.email.trim() && value.email.trim() !== user.email) data.email = value.email.trim()
@@ -183,6 +199,11 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleToggleVerify = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     const verified = !user.emailVerified
     try {
       await api.post('/admin/email-verify', { userId: user.id, verified })
@@ -194,6 +215,11 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleSetPassword = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     setSettingPassword(true)
     try {
       await passwordForm.handleSubmit()
@@ -203,12 +229,22 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleOpenEdit = () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     editUserForm.setFieldValue('name', user.name)
     editUserForm.setFieldValue('email', user.email)
     setEditOpen(true)
   }
 
   const handleUpdateUser = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     setSavingEdit(true)
     try {
       await editUserForm.handleSubmit()
@@ -218,6 +254,11 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleDeleteUser = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
+
     // Never delete yourself.
     if (user.id === currentUserId) {
       toast.error('You cannot delete yourself')
@@ -236,6 +277,10 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleRevokeSession = async (token: string) => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     setBusy(`revoke-session:${token}`)
     try {
       await adminApi.revokeUserSession({ sessionToken: token })
@@ -249,6 +294,10 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleRevokeAllSessions = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     setBusy(`revoke-all:${user.id}`)
     try {
       await adminApi.revokeUserSessions({ userId: user.id })

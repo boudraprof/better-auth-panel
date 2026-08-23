@@ -17,6 +17,7 @@ import {
 } from '#/components/ui/dialog'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
+import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 
 type RateLimitEntry = {
   id: string
@@ -36,6 +37,11 @@ function RateLimitsPage() {
   const [entries, setEntries] = useState<RateLimitEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [clearing, setClearing] = useState(false)
+  const demoMode = isDemoMode()
+
+  const showDemoModeMessage = () => {
+    toast.info(DEMO_MODE_MESSAGE)
+  }
 
   const fetchEntries = useCallback(async () => {
     setLoading(true)
@@ -54,6 +60,10 @@ function RateLimitsPage() {
   }, [fetchEntries])
 
   const handleClear = async () => {
+    if (demoMode) {
+      showDemoModeMessage()
+      return
+    }
     setClearing(true)
     try {
       await api.post('/admin/rate-limits', { action: 'clear' })

@@ -145,6 +145,37 @@ docker run -p 8000:8000 -v panel-data:/data \
 
 ---
 
+## Demo Mode
+
+The panel can be run as a **read-only public demo**. When demo mode is on, every
+mutating action is rejected and the UI explains why — so anyone can explore the
+dashboard, analytics, audit log, organizations, etc. without changing any data.
+
+Enable it with the `DEMO_MODE` environment variable:
+
+```bash
+# .env — defaults to 'true' when unset (this repo is deployed as a live demo)
+DEMO_MODE=true
+```
+
+What is blocked (server-side, so it can't be bypassed via the API either):
+
+- Creating / deleting / banning / unbanning users, impersonation, role changes
+- Editing or deleting your own profile, changing email or password
+- Managing organizations (create / delete / members / invitations)
+- Admin API mutations: email-verify, set-role, bulk-actions, seed-users,
+  email-config save/test, rate-limits clear, session revoke, …
+
+What still works:
+
+- **All reads** — browse users, analytics, audit log, orgs, sessions, hardware
+- Signing in (so visitors can see the authenticated experience)
+
+The client shows an amber banner and an informational toast on every disabled
+action. Set `DEMO_MODE=false` to run a normal, fully writable admin panel.
+
+---
+
 ## Scripts
 
 | Command | Description |
