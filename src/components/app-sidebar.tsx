@@ -55,6 +55,12 @@ export function AppSidebar() {
               <Link to="/" className="flex items-center gap-2 no-underline text-foreground">
                 <img src="/bp-icon.svg" alt="BP logo" className="size-7" />
                 <span className="text-base font-semibold">{APP_NAME}</span>
+                <span
+                  title="This app is in beta — features may change."
+                  className="rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400"
+                >
+                  Beta
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
