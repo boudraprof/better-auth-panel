@@ -9,10 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SysInfoRouteImport } from './routes/sys-info'
 import { Route as RateLimitsRouteImport } from './routes/rate-limits'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OrganizationsRouteImport } from './routes/organizations'
-import { Route as HardwareRouteImport } from './routes/hardware'
 import { Route as EmailConfigRouteImport } from './routes/email-config'
 import { Route as AuditLogRouteImport } from './routes/audit-log'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -23,6 +23,11 @@ import { Route as AuthForgotpasswordRouteImport } from './routes/auth.forgotpass
 import { Route as ApiV1AuthSplatRouteImport } from './routes/api.v1.auth.$'
 import { Route as ApiV1AdminSplatRouteImport } from './routes/api.v1.admin.$'
 
+const SysInfoRoute = SysInfoRouteImport.update({
+  id: '/sys-info',
+  path: '/sys-info',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RateLimitsRoute = RateLimitsRouteImport.update({
   id: '/rate-limits',
   path: '/rate-limits',
@@ -36,11 +41,6 @@ const ProfileRoute = ProfileRouteImport.update({
 const OrganizationsRoute = OrganizationsRouteImport.update({
   id: '/organizations',
   path: '/organizations',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HardwareRoute = HardwareRouteImport.update({
-  id: '/hardware',
-  path: '/hardware',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailConfigRoute = EmailConfigRouteImport.update({
@@ -94,10 +94,10 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/audit-log': typeof AuditLogRoute
   '/email-config': typeof EmailConfigRoute
-  '/hardware': typeof HardwareRoute
   '/organizations': typeof OrganizationsRoute
   '/profile': typeof ProfileRoute
   '/rate-limits': typeof RateLimitsRoute
+  '/sys-info': typeof SysInfoRoute
   '/auth/forgotpassword': typeof AuthForgotpasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -109,10 +109,10 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/audit-log': typeof AuditLogRoute
   '/email-config': typeof EmailConfigRoute
-  '/hardware': typeof HardwareRoute
   '/organizations': typeof OrganizationsRoute
   '/profile': typeof ProfileRoute
   '/rate-limits': typeof RateLimitsRoute
+  '/sys-info': typeof SysInfoRoute
   '/auth/forgotpassword': typeof AuthForgotpasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -125,10 +125,10 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/audit-log': typeof AuditLogRoute
   '/email-config': typeof EmailConfigRoute
-  '/hardware': typeof HardwareRoute
   '/organizations': typeof OrganizationsRoute
   '/profile': typeof ProfileRoute
   '/rate-limits': typeof RateLimitsRoute
+  '/sys-info': typeof SysInfoRoute
   '/auth/forgotpassword': typeof AuthForgotpasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
@@ -142,10 +142,10 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/audit-log'
     | '/email-config'
-    | '/hardware'
     | '/organizations'
     | '/profile'
     | '/rate-limits'
+    | '/sys-info'
     | '/auth/forgotpassword'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -157,10 +157,10 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/audit-log'
     | '/email-config'
-    | '/hardware'
     | '/organizations'
     | '/profile'
     | '/rate-limits'
+    | '/sys-info'
     | '/auth/forgotpassword'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -172,10 +172,10 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/audit-log'
     | '/email-config'
-    | '/hardware'
     | '/organizations'
     | '/profile'
     | '/rate-limits'
+    | '/sys-info'
     | '/auth/forgotpassword'
     | '/auth/reset-password'
     | '/auth/signin'
@@ -188,10 +188,10 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AuditLogRoute: typeof AuditLogRoute
   EmailConfigRoute: typeof EmailConfigRoute
-  HardwareRoute: typeof HardwareRoute
   OrganizationsRoute: typeof OrganizationsRoute
   ProfileRoute: typeof ProfileRoute
   RateLimitsRoute: typeof RateLimitsRoute
+  SysInfoRoute: typeof SysInfoRoute
   AuthForgotpasswordRoute: typeof AuthForgotpasswordRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
@@ -201,6 +201,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sys-info': {
+      id: '/sys-info'
+      path: '/sys-info'
+      fullPath: '/sys-info'
+      preLoaderRoute: typeof SysInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rate-limits': {
       id: '/rate-limits'
       path: '/rate-limits'
@@ -220,13 +227,6 @@ declare module '@tanstack/react-router' {
       path: '/organizations'
       fullPath: '/organizations'
       preLoaderRoute: typeof OrganizationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hardware': {
-      id: '/hardware'
-      path: '/hardware'
-      fullPath: '/hardware'
-      preLoaderRoute: typeof HardwareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email-config': {
@@ -300,10 +300,10 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AuditLogRoute: AuditLogRoute,
   EmailConfigRoute: EmailConfigRoute,
-  HardwareRoute: HardwareRoute,
   OrganizationsRoute: OrganizationsRoute,
   ProfileRoute: ProfileRoute,
   RateLimitsRoute: RateLimitsRoute,
+  SysInfoRoute: SysInfoRoute,
   AuthForgotpasswordRoute: AuthForgotpasswordRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,

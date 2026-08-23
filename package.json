@@ -1,6 +1,6 @@
 {
   "version": "2.10.0",
-  "name": "better-auth panel",
+  "name": "bp-admin-panel",
   "private": true,
   "type": "module",
   "imports": {

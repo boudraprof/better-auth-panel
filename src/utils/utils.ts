@@ -66,7 +66,7 @@ export const NAV_ITEMS: Array<NavItem> = [
   { label: 'Audit Log', to: '/audit-log', icon: ScrollText, roles: ['admin'] },
   { label: 'Analytics', to: '/analytics', icon: BarChart3, roles: ['admin'] },
   { label: 'Organizations', to: '/organizations', icon: Users, roles: ['admin', 'user'] },
-  { label: 'Hardware', to: '/hardware', icon: Radar, roles: ['admin'] },
+  { label: 'Sys Info', to: '/sys-info', icon: Radar, roles: ['admin'] },
   { label: 'Email', to: '/email-config', icon: Mail, roles: ['admin'] },
   { label: 'Rate Limits', to: '/rate-limits', icon: ShieldCheck, roles: ['admin'] },
   { label: 'My Account', to: '/profile', icon: UserCircle, roles: ['admin', 'user'] },

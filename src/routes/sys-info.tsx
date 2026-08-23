@@ -44,11 +44,11 @@ type HardwareData = {
   } | null
 }
 
-export const Route = createFileRoute('/hardware')({
+export const Route = createFileRoute('/sys-info')({
   server: {
     middleware: [adminMiddleware],
   },
-  component: HardwarePage,
+  component: SysInfo,
 })
 
 function formatBytes(bytes: number): string {
@@ -76,7 +76,7 @@ function Gauge({ label, value, percent, color }: { label: string; value: string;
   )
 }
 
-function HardwarePage() {
+function SysInfo() {
   const [data, setData] = useState<HardwareData | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -86,7 +86,7 @@ function HardwarePage() {
       const { data: hw } = await api.get<HardwareData>('/admin/hardware')
       setData(hw)
     } catch {
-      toast.error('Failed to fetch hardware status')
+      toast.error('Failed to fetch system info')
     } finally {
       setLoading(false)
     }
@@ -101,7 +101,7 @@ function HardwarePage() {
       <div className="h-full flex items-center justify-center">
         <div className="flex items-center gap-3 text-muted-foreground">
           <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-          Loading hardware status...
+          Loading system info...
         </div>
       </div>
     )
@@ -110,7 +110,7 @@ function HardwarePage() {
   if (!data) {
     return (
       <div className="h-full flex items-center justify-center text-muted-foreground">
-        Failed to load hardware status
+        Failed to load system info
       </div>
     )
   }
@@ -126,7 +126,7 @@ function HardwarePage() {
               <ArrowLeft className="size-4" />
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold">Hardware Status</h1>
+          <h1 className="text-3xl font-bold">System Info</h1>
         </div>
         <Button variant="outline" size="sm" onClick={fetchHardware} disabled={loading}>
           <RefreshCw className="size-4 mr-1" />

@@ -3,6 +3,7 @@ import { Loader2, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 import { signOut, useSession } from '#/utils/auth-client'
+import { APP_NAME } from '#/utils/app-name'
 import { normalizeRole } from '#/utils/permissions'
 
 import {
@@ -52,8 +53,8 @@ export function AppSidebar() {
               className="data-[active=true]:bg-transparent hover:bg-transparent"
             >
               <Link to="/" className="flex items-center gap-2 no-underline text-foreground">
-                <img src="/ap-icon.svg" alt="BP logo" className="size-7" />
-                <span className="text-base font-semibold">Better-auth Panel</span>
+                <img src="/bp-icon.svg" alt="BP logo" className="size-7" />
+                <span className="text-base font-semibold">{APP_NAME}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

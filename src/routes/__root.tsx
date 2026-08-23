@@ -15,6 +15,7 @@ import Footer from '../components/Footer'
 import Header from '../components/Header'
 
 import appCss from '../styles.css?url'
+import { documentTitle } from '#/utils/app-name'
 import { matchPaths } from '#/utils/utils'
 
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
@@ -30,7 +31,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'BP Admin Panel',
+        title: documentTitle(),
       },
     ],
     links: [
@@ -47,12 +48,12 @@ export const Route = createRootRoute({
         rel: 'icon',
         type: 'image/png',
         sizes: '128x128',
-        href: '/ap128.png',
+        href: '/bp128.png',
       },
       {
         rel: 'apple-touch-icon',
         sizes: '512x512',
-        href: '/ap512.png',
+        href: '/bp512.png',
       },
       {
         rel: 'manifest',

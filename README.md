@@ -20,7 +20,7 @@ Give your Better Auth app a fully-featured admin dashboard: manage users, sessio
 | 📊 **Analytics** | Signups, active users, session activity, role distribution, cumulative growth charts |
 | 🏢 **Organizations** | Inspect and delete multi-tenant orgs, view members and roles |
 | 📧 **Email Config** | SMTP settings UI with test email, used for password resets and verification |
-| 🖥️ **Hardware Monitor** | Live CPU / memory / disk / uptime gauges in the header |
+| 🖥️ **System Info** | Live CPU / memory / disk / uptime gauges in the header |
 | 🚦 **Rate Limits UI** | Inspect and clear rate-limit state from the dashboard |
 | 🌐 **Global Sessions** | View and revoke all active sessions across the entire app |
 | 📖 **Interactive API Docs** | OpenAPI/Scalar reference at `/v1/api/reference` |
@@ -184,7 +184,7 @@ better-auth-panel/
 │   │   ├── organizations.tsx  # Organization management
 │   │   ├── audit-log.tsx      # Audit log viewer
 │   │   ├── email-config.tsx   # SMTP email configuration
-│   │   ├── hardware.tsx       # Hardware monitoring
+│   │   ├── sys-info.tsx       # System information
 │   │   ├── rate-limits.tsx    # Rate limits inspector
 │   │   └── api.v1.admin.$.ts  # All admin API endpoints
 │   └── utils/                 # Auth, audit, email, session, config, logger helpers

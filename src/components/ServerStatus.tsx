@@ -77,7 +77,7 @@
 //       <Tooltip>
 //         <TooltipTrigger asChild>
 //           <Link
-//             to="/hardware"
+//             to="/sys-info"
 //             aria-label="Server status — click for details"
 //             className="group flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground shadow-sm transition hover:border-ring hover:text-foreground"
 //           >
@@ -284,7 +284,7 @@ export default function ServerStatus() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Link
-            to="/hardware"
+            to="/sys-info"
             aria-label="Server status — click for details"
             className="group flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground shadow-sm transition hover:border-ring hover:text-foreground"
           >

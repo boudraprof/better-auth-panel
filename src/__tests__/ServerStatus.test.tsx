@@ -54,8 +54,8 @@ describe('ServerStatus', () => {
     await waitFor(() => expect(apiGet).toHaveBeenCalledWith('/admin/hardware'))
     expect(await screen.findByText('40%')).toBeTruthy()
     expect(screen.getByText('50%')).toBeTruthy()
-    // link points at the hardware page
-    expect(screen.getByRole('link').getAttribute('href')).toBe('/hardware')
+    // link points at the system info page
+    expect(screen.getByRole('link').getAttribute('href')).toBe('/sys-info')
   })
 
   it('shows a detailed tooltip on hover', async () => {

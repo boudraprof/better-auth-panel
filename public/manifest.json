@@ -4,12 +4,12 @@
   "description": "Admin panel for My Notes.",
   "icons": [
     {
-      "src": "ap192.png",
+      "src": "bp192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "ap512.png",
+      "src": "bp512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
