@@ -8,6 +8,17 @@
 
 Give your Better Auth app a fully-featured admin dashboard: manage users, sessions, organizations, security settings, and server health — all from a single, secure interface.
 
+## Overview
+
+**Better Auth Admin Panel** is a self-hostable management console for applications built on [Better Auth](https://better-auth.com). It gives administrators a single, secure place to:
+
+- **Manage users** — search, filter, ban/unban, assign roles, verify emails, and inspect per-user activity and sessions.
+- **Oversee organizations** — browse multi-tenant orgs, their members, and roles.
+- **Harden security** — database-backed rate limiting, session revocation, and an audit log that records every privileged action.
+- **Monitor health** — live system metrics (CPU, memory, disk, uptime) and an interactive OpenAPI reference.
+
+The panel ships with role-based access control (`admin` / `user`) enforced server-side, and can be run as a **read-only public demo** (`DEMO_MODE=true`, the default) so visitors can explore safely without changing any data. It is currently **in beta** — features may change.
+
 ---
 
 ## Features
