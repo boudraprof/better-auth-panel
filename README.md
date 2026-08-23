@@ -162,6 +162,15 @@ The panel can be run as a **read-only public demo**. When demo mode is on, every
 mutating action is rejected and the UI explains why — so anyone can explore the
 dashboard, analytics, audit log, organizations, etc. without changing any data.
 
+### Try the live demo
+
+A read-only instance is deployed at `https://is.demoteam.ch`. Sign in with the
+shared demo account — all changes are disabled, so explore freely:
+
+| Email | Password |
+|-------|----------|
+| `demo@example.com` | `admin123` |
+
 Enable it with the `DEMO_MODE` environment variable:
 
 ```bash
