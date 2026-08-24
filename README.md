@@ -1,5 +1,21 @@
 # Better Auth Admin Panel
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Production](#production)
+- [Demo Mode](#demo-mode)
+- [Scripts](#scripts)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+- [Migrations](#migrations)
+- [License](#license)
+
+## Introduction <a id="introduction"></a>
+
 > **Beta** — A self-hostable admin panel for [Better Auth](https://better-auth.com) applications. Manage users, sessions, organizations, security settings, and system health from one secure, focused dashboard. Built with [TanStack Start](https://tanstack.com/start), React 19, Drizzle ORM, and shadcn/ui.
 
 ![Version](https://img.shields.io/badge/version-1.10.0-blue)
@@ -8,7 +24,7 @@
 
 ---
 
-## Features
+## Features <a id="features"></a>
 
 | Area | What you get |
 |:-----|:-------------|
@@ -26,7 +42,7 @@
 
 ---
 
-## Tech Stack
+## Tech Stack <a id="tech-stack"></a>
 
 | Layer | Choice |
 |-------|--------|
@@ -39,7 +55,7 @@
 
 ---
 
-## Getting Started
+## Getting Started <a id="getting-started"></a>
 
 ### Prerequisites
 
@@ -115,7 +131,7 @@ Open **http://localhost:8000** in your browser.
 
 ---
 
-## Production
+## Production <a id="production"></a>
 
 ### Build & run
 
@@ -149,7 +165,7 @@ docker run -p 8000:8000 -v panel-data:/data \
 
 ---
 
-## Demo Mode
+## Demo Mode <a id="demo-mode"></a>
 
 The panel can be run as a **read-only public demo**. When demo mode is on, every
 mutating action is rejected and the UI explains why — so anyone can explore the
@@ -189,7 +205,7 @@ action. Set `DEMO_MODE=false` to run a normal, fully writable admin panel.
 
 ---
 
-## Scripts
+## Scripts <a id="scripts"></a>
 
 | Command | Description |
 |---------|-------------|
@@ -212,7 +228,7 @@ action. Set `DEMO_MODE=false` to run a normal, fully writable admin panel.
 
 ---
 
-## Project Structure
+## Project Structure <a id="project-structure"></a>
 
 ```
 better-auth-panel/
@@ -242,7 +258,7 @@ better-auth-panel/
 
 ---
 
-## Environment Variables
+## Environment Variables <a id="environment-variables"></a>
 
 See [`.env.example`](.env.example) for the full annotated list.
 
@@ -264,7 +280,7 @@ See [`.env.example`](.env.example) for the full annotated list.
 
 ---
 
-## Migrations
+## Migrations <a id="migrations"></a>
 
 - **SQLite (dev)** — `npm run db:sqlite:migrate` applies migrations from the Drizzle journal.
 - **PostgreSQL** — `npm run db:migrate` applies the full journal.
@@ -272,6 +288,6 @@ See [`.env.example`](.env.example) for the full annotated list.
 
 ---
 
-## License
+## License <a id="license"></a>
 
 [GNU Affero General Public License v3.0](licence) (AGPL-3.0)
