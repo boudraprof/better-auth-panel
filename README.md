@@ -17,18 +17,18 @@ A self-hostable admin panel for Better Auth apps. **This app is in beta** — fe
 ## Features
 
 | Area | What you get |
-|------|-------------|
-| 👥 **User Management** | Search, filter, sort, bulk ban/delete, role changes, impersonation, email verification toggle, activity timeline, CSV export, create-user & seed-user dialogs |
-| 🔒 **Security** | DB-backed rate limiting, encrypted OAuth tokens, session revocation, impersonation guard, CSRF protection, hard cookies (`HttpOnly`, `Secure`, `SameSite=Strict`) |
-| 📋 **Audit Log** | Every privileged action recorded (actor, target, IP, user-agent, metadata) |
-| 📊 **Analytics** | Signups, active users, session activity, role distribution, cumulative growth charts |
-| 🏢 **Organizations** | Inspect and delete multi-tenant orgs, view members and roles |
-| 📧 **Email Config** | SMTP settings UI with test email, used for password resets and verification |
-| 🖥️ **System Info** | Live CPU / memory / disk / uptime gauges in the header |
-| 🚦 **Rate Limits UI** | Inspect and clear rate-limit state from the dashboard |
-| 🌐 **Global Sessions** | View and revoke all active sessions across the entire app |
-| 🛡️ **RBAC** | `admin` (full) and `user` roles with granular server-side permission enforcement |
-| ⚡ **Better Auth Infra** | Optional dash analytics + sentinel abuse protection when `BETTER_AUTH_API_KEY` is set |
+|:-----|:-------------|
+| **User management** | Search, filter, sort, bulk ban/delete, role changes, impersonation, email verification, activity timeline, CSV export, and user creation/seed dialogs |
+| **Security** | Database-backed rate limiting, encrypted OAuth tokens, session revocation, impersonation protection, CSRF protection, and secure cookies |
+| **Audit log** | A record of every privileged action, including actor, target, IP address, user agent, and metadata |
+| **Analytics** | Signup trends, active users, session activity, role distribution, and cumulative growth charts |
+| **Organizations** | Inspect and delete multi-tenant organizations, and view members and roles |
+| **Email configuration** | SMTP settings with test email support for password resets and verification |
+| **System information** | Live CPU, memory, disk, and uptime metrics in the header |
+| **Rate limits** | Inspect and clear rate-limit state from the dashboard |
+| **Global sessions** | View and revoke active sessions across the entire app |
+| **RBAC** | `admin` and `user` roles with granular server-side permission enforcement |
+| **Better Auth infrastructure** | Optional Dash analytics and Sentinel abuse protection when `BETTER_AUTH_API_KEY` is set |
 
 ---
 
