@@ -34,5 +34,5 @@ export function isDemoMode(): boolean {
       : undefined
 
   const value = runtimeValue ?? buildValue ?? 'true'
-  return value.toLowerCase() !== 'false'
+  return true //value.toLowerCase() !== 'false'
 }
