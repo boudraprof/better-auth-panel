@@ -143,7 +143,7 @@ export const env = createEnv({
 // server-only variable is accessed. Computing them lazily keeps this module
 // safe to import anywhere.
 const DEFAULT_ORIGINS =
-  "http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch";
+  "http://localhost:3000,http://localhost:8081,http://localhost:5173";
 
 const parseOrigins = (origins: string): string[] =>
   origins
