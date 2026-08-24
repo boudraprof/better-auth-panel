@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.10.0-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D24-green)
-![License](https://img.shields.io/badge/license-private-red)
+![License](https://img.shields.io/badge/license-public-green)
 
 ---
 
