@@ -27,12 +27,12 @@ const mergeOrigins = (configured: Array<string>): Array<string> =>
 export const trustedOrigins = mergeOrigins(
   parseOrigins(
     env.BETTER_AUTH_TRUSTED_ORIGINS ||
-      "http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch",
+      "http://localhost:3000,http://localhost:8081,http://localhost:5173",
   ),
 )
 export const allowedOrigins = mergeOrigins(
   parseOrigins(
     env.ALLOWED_ORIGINS ||
-      "http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch",
+      "http://localhost:3000,http://localhost:8081,http://localhost:5173",
   ),
 )
