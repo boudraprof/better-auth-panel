@@ -1,6 +1,6 @@
 # Better Auth Admin Panel
 
-> A production-grade admin panel for [Better Auth](https://better-auth.com) powered apps, built with [TanStack Start](https://tanstack.com/start) (React 19), Drizzle ORM, and shadcn/ui.
+> > **Beta** — A self-hostable admin panel for [Better Auth](https://better-auth.com) applications. Manage users, sessions, organizations, security settings, and system health from one secure, focused dashboard. Built with [TanStack Start](https://tanstack.com/start), React 19, Drizzle ORM, and shadcn/ui.
 
 ![Version](https://img.shields.io/badge/version-1.10.0-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D24-green)
