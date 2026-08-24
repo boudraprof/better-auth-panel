@@ -1,11 +1,10 @@
+import { env } from '#/utils/env'
+
 // The application's display name, used in the document <title> and elsewhere.
 // It is configurable per deployment via the VITE_APP_NAME env var so the same
 // build can be branded differently without code changes. Falls back to
 // "BA admin panel" when unset (e.g. local dev without a .env override).
-const configured =
-  (typeof import.meta !== 'undefined' &&
-    (import.meta.env.VITE_APP_NAME as string | undefined)) ||
-  undefined
+const configured = env.VITE_APP_NAME
 
 export const APP_NAME = (configured ?? '').trim() || 'BA admin panel'
 

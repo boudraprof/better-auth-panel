@@ -1,6 +1,8 @@
 export const DEMO_MODE_MESSAGE =
   'Demo mode: user changes are disabled. You can view data only.'
 
+import { env } from '#/utils/env'
+
 /**
  * Whether the panel runs in read-only demo mode.
  *
@@ -35,8 +37,7 @@ export function isDemoMode(): boolean {
 
   const buildValue =
     typeof import.meta !== 'undefined'
-      ? ((import.meta.env as Record<string, string | undefined> | undefined)
-          ?.VITE_DEMO_MODE)
+      ? env.VITE_DEMO_MODE
       : undefined
 
   const value = runtimeValue ?? buildValue ?? 'true'
