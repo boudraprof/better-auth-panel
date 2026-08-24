@@ -52,14 +52,21 @@ export function AppSidebar() {
               size="lg"
               className="data-[active=true]:bg-transparent hover:bg-transparent"
             >
-              <Link to="/" className="flex items-center gap-2 no-underline text-foreground">
-                <img src="/bp-icon.svg" alt="BA logo" className="size-7" />
-                <span className="text-base font-semibold">{APP_NAME}</span>
-                <span
-                  title="This app is in beta — features may change."
-                  className="rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400"
-                >
-                  Beta
+              <Link to="/" className="flex items-start gap-3 no-underline text-foreground">
+                <img src="/bp-icon.svg" alt="BA logo" className="mt-0.5 size-7 shrink-0" />
+                <span className="flex min-w-0 flex-col gap-1">
+                  <span className="flex items-center gap-2">
+                    <span className="truncate text-base font-semibold">{APP_NAME}</span>
+                    <span
+                      title="This app is in beta — features may change."
+                      className="shrink-0 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400"
+                    >
+                      Beta
+                    </span>
+                  </span>
+                  <span className="text-xs leading-4 text-muted-foreground">
+                    A focused workspace for managing authentication and users.
+                  </span>
                 </span>
               </Link>
             </SidebarMenuButton>
