@@ -1,6 +1,7 @@
-import { allowedOrigins } from '#/utils/env'
+import { getAllowedOrigins } from '#/env'
 
 export const corsHeaders = (origin: string | null): Record<string, string> => {
+  const allowedOrigins = getAllowedOrigins()
   const o =
     origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0]
   return {
@@ -50,7 +51,7 @@ export const corsJson = (
  */
 export function originGuard(request: Request): Response | null {
   const origin = request.headers.get('origin')
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (origin && !getAllowedOrigins().includes(origin)) {
     return corsJson(
       request,
       { error: true, message: 'Origin not allowed' },

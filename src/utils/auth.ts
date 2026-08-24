@@ -6,8 +6,7 @@ import { createAuthMiddleware } from 'better-auth/api'
 import { admin, bearer, openAPI, organization } from 'better-auth/plugins'
 import { APIError, betterAuth } from 'better-auth'
 
-import { trustedOrigins } from '#/utils/env'
-import { env } from '#/env'
+import { env, getTrustedOrigins } from '#/env'
 import { db, dbDriver, schema } from '#/utils/config'
 import { audit } from '#/utils/audit'
 import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
@@ -57,7 +56,7 @@ export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_BASE_URL,
   basePath: env.BETTER_AUTH_BASE_PATH,
   secret: env.BETTER_AUTH_SECRET,
-  trustedOrigins,
+  trustedOrigins: getTrustedOrigins(),
   // Harden cookies for an admin panel: force HTTPS cookies and strict
   // same-site so the session cookie is never sent on cross-site requests.
   advanced: {

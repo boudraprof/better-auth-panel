@@ -134,3 +134,40 @@ export const env = createEnv({
   skipValidation:
     typeof process !== "undefined" && !!process.env.SKIP_ENV_VALIDATION,
 });
+
+// ─── Derived CORS / auth trusted origins (server-only) ──────────────────────
+// These derive from server-only env vars, so they are exposed as *lazy*
+// functions and only evaluated when called on the server. They must NOT be
+// evaluated at module load: `src/env.ts` is also imported by client code
+// (e.g. `axios.ts`), and on the client the t3-env proxy throws when a
+// server-only variable is accessed. Computing them lazily keeps this module
+// safe to import anywhere.
+const DEFAULT_ORIGINS =
+  "http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch";
+
+const parseOrigins = (origins: string): string[] =>
+  origins
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+const baseOrigin = (): string => {
+  try {
+    return new URL(env.BETTER_AUTH_BASE_URL || "http://localhost:8080").origin;
+  } catch {
+    return "http://localhost:8080";
+  }
+};
+
+const mergeOrigins = (configured: string[]): string[] =>
+  Array.from(new Set([...configured, baseOrigin()]));
+
+export function getTrustedOrigins(): string[] {
+  return mergeOrigins(
+    parseOrigins(env.BETTER_AUTH_TRUSTED_ORIGINS || DEFAULT_ORIGINS),
+  );
+}
+
+export function getAllowedOrigins(): string[] {
+  return mergeOrigins(parseOrigins(env.ALLOWED_ORIGINS || DEFAULT_ORIGINS));
+}
