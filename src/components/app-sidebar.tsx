@@ -64,9 +64,6 @@ export function AppSidebar() {
                       Beta
                     </span>
                   </span>
-                  <span className="text-xs leading-4 text-muted-foreground">
-                    A focused workspace for managing authentication and users.
-                  </span>
                 </span>
               </Link>
             </SidebarMenuButton>
