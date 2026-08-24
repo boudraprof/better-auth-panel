@@ -24,7 +24,7 @@ export const DEMO_MODE_MESSAGE =
 export function isDemoMode(): boolean {
   const runtimeValue =
     typeof process !== 'undefined'
-      ? (process.env.DEMO_MODE || process.env.VITE_DEMO_MODE)
+      ? (process.env.DEMO_MODE ?? process.env.VITE_DEMO_MODE)
       : undefined
 
   const buildValue =
