@@ -6,13 +6,14 @@ import { createClient } from '@libsql/client'
 
 import * as pgSchema from '#/db/schema'
 import * as sqliteSchema from '#/db/schema-sqlite'
+import { env } from '#/env'
 
-export const dbDriver = process.env.DB_DRIVER || 'pg'
+export const dbDriver = env.DB_DRIVER
 
 function createPgDb() {
   return drizzlePg({
     connection: {
-      connectionString: process.env.DATABASE_URL,
+      connectionString: env.DATABASE_URL,
       ssl: false,
     },
     schema: pgSchema,
@@ -20,14 +21,14 @@ function createPgDb() {
 }
 
 function createSqliteDb() {
-  const tursoUrl = process.env.TURSO_DATABASE_URL
-  const sqlitePath = process.env.SQLITE_DB_PATH || './src/db/sqlite/admin-panel.db'
+  const tursoUrl = env.TURSO_DATABASE_URL
+  const sqlitePath = env.SQLITE_DB_PATH || './src/db/sqlite/admin-panel.db'
 
   // If TURSO_DATABASE_URL is set (and starts with libsql:// or https://), use LibSQL client
   if (tursoUrl && (tursoUrl.startsWith('libsql://') || tursoUrl.startsWith('https://'))) {
     const client = createClient({
       url: tursoUrl,
-      authToken: process.env.TURSO_AUTH_TOKEN,
+      authToken: env.TURSO_AUTH_TOKEN,
     })
     return drizzleLibSql(client, { schema: sqliteSchema })
   }

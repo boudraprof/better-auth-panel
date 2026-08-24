@@ -7,6 +7,7 @@ import { admin, bearer, openAPI, organization } from 'better-auth/plugins'
 import { APIError, betterAuth } from 'better-auth'
 
 import { trustedOrigins } from '#/utils/env'
+import { env } from '#/env'
 import { db, dbDriver, schema } from '#/utils/config'
 import { audit } from '#/utils/audit'
 import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
@@ -53,9 +54,9 @@ const DEMO_BLOCKED_PATHS = new Set([
 ])
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_BASE_URL,
-  basePath: process.env.BETTER_AUTH_BASE_PATH,
-  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_BASE_URL,
+  basePath: env.BETTER_AUTH_BASE_PATH,
+  secret: env.BETTER_AUTH_SECRET,
   trustedOrigins,
   // Harden cookies for an admin panel: force HTTPS cookies and strict
   // same-site so the session cookie is never sent on cross-site requests.
@@ -75,7 +76,7 @@ export const auth = betterAuth({
     // trusted proxy the socket address is used, which is safe by default.
     ipAddress: {
       ipAddressHeaders: ['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip'],
-      trustedProxies: (process.env.TRUSTED_PROXIES || '')
+      trustedProxies: (env.TRUSTED_PROXIES || '')
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean),
@@ -235,7 +236,7 @@ export const auth = betterAuth({
         enabled: true,
       },
       sendInvitationEmail: async ({ email, organization, invitation, inviter }) => {
-        const baseUrl = process.env.BETTER_AUTH_URL || process.env.APP_URL || ''
+        const baseUrl = env.BETTER_AUTH_URL || env.APP_URL || ''
         const acceptUrl = `${baseUrl}/accept-invitation?id=${invitation.id}`
         const result = await sendEmail({
           to: email,
@@ -265,7 +266,7 @@ export const auth = betterAuth({
     // protection). Only enabled when BETTER_AUTH_API_KEY is set — they phone
     // home to better-auth.com and are useless without the Dash API key.
     // Get a key at https://better-auth.com (account → API keys).
-    ...(process.env.BETTER_AUTH_API_KEY
+    ...(env.BETTER_AUTH_API_KEY
       ? [
           dash(),
           sentinel({

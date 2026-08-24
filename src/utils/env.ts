@@ -1,6 +1,8 @@
+import { env } from "#/env";
+
 const parseOrigins = (origins: string): Array<string> => {
   return origins
-    .split(',')
+    .split(",")
     .map((o) => o.trim())
     .filter(Boolean)
 }
@@ -12,10 +14,10 @@ const parseOrigins = (origins: string): Array<string> => {
 const baseOrigin = (() => {
   try {
     return new URL(
-      process.env.BETTER_AUTH_BASE_URL || 'http://localhost:8080',
+      env.BETTER_AUTH_BASE_URL || "http://localhost:8080",
     ).origin
   } catch {
-    return 'http://localhost:8080'
+    return "http://localhost:8080"
   }
 })()
 
@@ -24,13 +26,13 @@ const mergeOrigins = (configured: Array<string>): Array<string> =>
 
 export const trustedOrigins = mergeOrigins(
   parseOrigins(
-    process.env.BETTER_AUTH_TRUSTED_ORIGINS ||
-      'http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch',
+    env.BETTER_AUTH_TRUSTED_ORIGINS ||
+      "http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch",
   ),
 )
 export const allowedOrigins = mergeOrigins(
   parseOrigins(
-    process.env.ALLOWED_ORIGINS ||
-      'http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch',
+    env.ALLOWED_ORIGINS ||
+      "http://localhost:3000,http://localhost:8081,http://localhost:5173,https://is.demoteam.ch",
   ),
 )

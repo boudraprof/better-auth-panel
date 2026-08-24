@@ -1,4 +1,6 @@
-const BASE_URL = process.env.BETTER_AUTH_BASE_URL as string
+import { env } from '#/env'
+
+const BASE_URL = env.BETTER_AUTH_BASE_URL
 
 export function parseRequestSearchParams(request: Request): URLSearchParams {
   const url = request.url || ''
