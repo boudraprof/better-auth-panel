@@ -6,12 +6,6 @@
 ![Node](https://img.shields.io/badge/node-%3E%3D24-green)
 ![License](https://img.shields.io/badge/license-private-red)
 
-Give your Better Auth app a fully-featured admin dashboard: manage users, sessions, organizations, security settings, and server health — all from a single, secure interface.
-
-## Overview
-
-A self-hostable admin panel for Better Auth apps. **This app is in beta** — features may change.
-
 ---
 
 ## Features
