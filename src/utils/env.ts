@@ -45,9 +45,7 @@ export const env = createEnv({
       .string()
       .min(1, "BETTER_AUTH_SECRET is required")
       .describe("Secret for signing session cookies"),
-    BETTER_AUTH_BASE_URL: z
-      .string()
-      .url()
+    BETTER_AUTH_BASE_URL: z.url()
       .default("http://localhost:8000")
       .describe("Public base URL for auth endpoints"),
     BETTER_AUTH_BASE_PATH: z
@@ -117,9 +115,7 @@ export const env = createEnv({
       .optional()
       .default("true")
       .describe("Demo mode flag for client bundle"),
-    VITE_BETTER_AUTH_BASE_URL: z
-      .string()
-      .url()
+    VITE_BETTER_AUTH_BASE_URL: z.url()
       .optional()
       .describe("Client-side auth base URL"),
     VITE_BETTER_AUTH_BASE_PATH: z

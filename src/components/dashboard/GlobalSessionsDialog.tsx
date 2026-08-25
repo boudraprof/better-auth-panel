@@ -8,18 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog'
-import type { GlobalSession } from './types'
 import api from '#/utils/axios'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
+import type { GlobalSession, UserAgentInfo } from '#/types'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
 
-type UserAgentInfo = { browser: string; os: string; mobile: boolean }
 
-/**
- * Best-effort parse of a User-Agent string into a human-readable
- * browser / OS / device-type summary. No external dependency — covers the
- * common desktop and mobile agents; anything unrecognised falls back to
- * "Unknown ...".
- */
+
+
+
 function parseUserAgent(ua: string | null | undefined): UserAgentInfo {
   const agent = ua ?? ''
   const mobile = /Mobile|Android|iPhone|iPad|iPod/i.test(agent)

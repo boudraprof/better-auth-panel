@@ -18,27 +18,11 @@ import {
 } from '#/components/ui/dialog'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
+import {  isDemoMode } from '#/utils/utils'
+import type { Organization, OrgMember } from '#/types'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
 
-type Organization = {
-  id: string
-  name: string
-  slug: string
-  logo: string | null
-  createdAt: string
-  updatedAt: string
-  memberCount: number
-}
 
-type OrgMember = {
-  id: string
-  role: string
-  createdAt: string
-  userId: string
-  name: string | null
-  email: string
-  image: string | null
-}
 
 export const Route = createFileRoute('/organizations')({
   server: {

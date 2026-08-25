@@ -6,7 +6,7 @@ import { createClient } from '@libsql/client'
 
 import * as pgSchema from '#/db/schema'
 import * as sqliteSchema from '#/db/schema-sqlite'
-import { env } from '#/env'
+import { env } from '#/utils/env'
 
 export const dbDriver = env.DB_DRIVER
 

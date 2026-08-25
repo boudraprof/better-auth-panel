@@ -27,31 +27,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import type { Account, Session, User } from './types'
 import api from '#/utils/axios'
 import { useSession, authClient } from '#/utils/auth-client'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import InputError from '#/components/InputError'
+import type { Account, ActivityLog, Session,  UserDetailDialogProps } from '#/types'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
 
 const { admin: adminApi } = authClient
 
-type ActivityLog = {
-  id: string
-  action: string
-  createdAt: string
-  metadata?: string
-}
 
-type Props = {
-  user: User | null
-  onClose: () => void
-  onUserDeleted: () => void
-  onUserUpdated: (userId: string, patch: Partial<User>) => void
-  /** When false (non-admin viewer), all mutating controls are hidden. */
-  canManage?: boolean
-}
 
-export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, canManage = true }: Props) {
+export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, canManage = true }: UserDetailDialogProps) {
   const { data: sessionData } = useSession()
   const currentUserId = sessionData?.user.id ?? null
   const demoMode = isDemoMode()

@@ -20,55 +20,11 @@ import {
 } from '#/components/ui/select'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
+import type { AuditEntry } from '#/types'
+import { ACTION_COLORS, ACTION_LABELS } from '#/utils/constants'
 
-type AuditEntry = {
-  id: string
-  actorId: string
-  actorEmail: string | null
-  action: string
-  targetId: string | null
-  targetEmail: string | null
-  metadata: string | null
-  ipAddress: string | null
-  userAgent: string | null
-  createdAt: string
-}
 
-const ACTION_LABELS: Record<string, string> = {
-  'user.ban': 'Ban User',
-  'user.unban': 'Unban User',
-  'user.delete': 'Delete User',
-  'user.set-role': 'Change Role',
-  'user.impersonate': 'Impersonate',
-  'user.stop-impersonating': 'Stop Impersonating',
-  'user.set-password': 'Set Password',
-  'user.create': 'Create User',
-  'user.update': 'Update User',
-  'user.email-verify': 'Verify Email',
-  'user.email-unverify': 'Unverify Email',
-  'session.revoke': 'Revoke Session',
-  'users.seed': 'Seed Users',
-  'users.bulk-ban': 'Bulk Ban',
-  'users.bulk-unban': 'Bulk Unban',
-  'users.bulk-delete': 'Bulk Delete',
-  'users.bulk-makeAdmin': 'Bulk Make Admin',
-  'users.bulk-removeAdmin': 'Bulk Remove Admin',
-}
 
-type BadgeVariant = 'default' | 'destructive' | 'secondary' | 'outline'
-
-const ACTION_COLORS: Partial<Record<string, BadgeVariant>> = {
-  'user.ban': 'destructive',
-  'user.delete': 'destructive',
-  'user.unban': 'default',
-  'user.set-role': 'secondary',
-  'user.impersonate': 'secondary',
-  'user.set-password': 'secondary',
-  'user.create': 'default',
-  'user.update': 'secondary',
-  'user.email-verify': 'default',
-  'user.email-unverify': 'secondary',
-}
 
 export const Route = createFileRoute('/audit-log')({
   server: {

@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '#/components/ui/sidebar'
-import { NAV_ITEMS } from '#/utils/utils'
+import { NAV_ITEMS } from '#/utils/constants'
 
 export function AppSidebar() {
   const router = useRouter()
@@ -52,10 +52,10 @@ export function AppSidebar() {
               size="lg"
               className="data-[active=true]:bg-transparent hover:bg-transparent"
             >
-              <Link to="/" className="flex items-start gap-3 no-underline text-foreground">
+              <Link to="/" className="flex items-center justify-center gap-3 no-underline text-foreground">
                 <img src="/bp-icon.svg" alt="BA logo" className="mt-0.5 size-7 shrink-0" />
                 <span className="flex min-w-0 flex-col gap-1">
-                  <span className="flex items-center gap-2">
+                  <span className="flex justify-center items-center gap-2">
                     <span className="truncate text-base font-semibold">{APP_NAME}</span>
                     <span
                       title="This app is in beta — features may change."

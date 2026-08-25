@@ -2,14 +2,12 @@
  * Structured logger for admin panel
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+import type { LogLevel } from "#/types"
+import { LOG_LEVELS } from "./constants"
 
-const LOG_LEVELS: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3,
-}
+
+
+
 
 const currentLevel: LogLevel = import.meta.env.DEV ? 'debug' : 'info'
 

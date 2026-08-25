@@ -1,24 +1,7 @@
-/**
- * Error tracking for admin panel
- */
-
-interface ErrorContext {
-  component?: string
-  action?: string
-  userId?: string
-  metadata?: Record<string, unknown>
-}
-
-interface TrackedError {
-  message: string
-  stack?: string
-  context: ErrorContext
-  timestamp: number
-  url: string
-}
+import type { ErrorContext, TrackedError } from "#/types"
+import { MAX_QUEUE_SIZE } from "./constants"
 
 const errorQueue: TrackedError[] = []
-const MAX_QUEUE_SIZE = 50
 
 function getUserId(): string | undefined {
   try {
@@ -64,6 +47,7 @@ export function trackError(error: Error | unknown, context: ErrorContext = {}): 
   const tracked = formatError(errorObj, context)
 
   errorQueue.push(tracked)
+
 
   if (errorQueue.length >= MAX_QUEUE_SIZE) {
     void flushQueue()

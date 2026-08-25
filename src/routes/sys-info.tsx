@@ -7,42 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Button } from '#/components/ui/button'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
+import type { HardwareData } from '#/types'
 
-type HardwareData = {
-  hostname: string
-  platform: string
-  distro?: string
-  release?: string
-  kernel?: string
-  arch: string
-  nodeVersion: string
-  uptime: { days: number; hours: number; minutes: number; seconds: number }
-  cpu: {
-    model: string
-    manufacturer?: string
-    cores: number
-    physicalCores?: number
-    speed?: number
-    loadPercent: number
-    userPercent?: number
-    systemPercent?: number
-  }
-  memory: {
-    total: number
-    used: number
-    free: number
-    available?: number
-    percent: number
-  }
-  disk: {
-    filesystem?: string
-    mount?: string
-    total: number
-    used: number
-    free: number
-    percent: number
-  } | null
-}
+
 
 export const Route = createFileRoute('/sys-info')({
   server: {

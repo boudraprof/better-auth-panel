@@ -34,9 +34,10 @@ import {
 } from '#/components/ui/dialog'
 import { authedMiddleware } from '#/middleware/authed'
 import { useSession, authClient } from '#/utils/auth-client'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import { normalizeRole } from '#/utils/permissions'
 import InputError from '#/components/InputError'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
 
 const { updateUser, changePassword, changeEmail, deleteUser } = authClient
 

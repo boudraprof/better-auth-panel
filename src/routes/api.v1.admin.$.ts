@@ -9,15 +9,14 @@ import { getServerSession } from '#/utils/session'
 import { auth } from '#/utils/auth'
 import { requestUrl } from '#/utils/url'
 import { assertAdmin } from '#/utils/admin'
-import { isUrlPath } from '#/utils/utils'
+import { isDemoMode, isUrlPath } from '#/utils/utils'
 import { audit } from '#/utils/audit'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
 import logger from '#/utils/logger'
+import { ADMIN_CUSTOM_PATHS, DEMO_MODE_MESSAGE } from '#/utils/constants'
 
-/**
- * Database-backed rate limiter (per route key). Uses the `rate_limit` table
- * so limits survive restarts and are visible in the Rate Limits admin UI.
- */
+
+
+
 async function rateLimit(key: string, max: number, windowMs: number): Promise<boolean> {
   const now = Date.now()
   const windowStart = now - windowMs
@@ -72,35 +71,6 @@ async function rateLimit(key: string, max: number, windowMs: number): Promise<bo
   }
 }
 
-/**
- * Custom admin subpaths handled by this route.
- * Anything else under /api/v1/admin/* is forwarded to Better Auth.
- */
-const ADMIN_CUSTOM_PATHS = new Set([
-  '/api/v1/admin/stats',
-  '/api/v1/admin/accounts',
-  '/api/v1/admin/sessions',
-  '/api/v1/admin/sessions/revoke',
-  '/api/v1/admin/seed-users',
-  '/api/v1/admin/audit-logs',
-  '/api/v1/admin/analytics',
-  '/api/v1/admin/email-verify',
-  '/api/v1/admin/set-role',
-  '/api/v1/admin/bulk-actions',
-  '/api/v1/admin/export-users',
-  '/api/v1/admin/hardware',
-  '/api/v1/admin/user-activity',
-  '/api/v1/admin/email-config',
-  '/api/v1/admin/email-config/test',
-  '/api/v1/admin/rate-limits',
-  '/api/v1/admin/organizations',
-  '/api/v1/admin/organizations/members',
-  '/api/v1/admin/organizations/delete',
-])
-
-/**
- * Admin-only endpoints.
- */
 async function requireAdmin(request: Request) {
   const ses = await getServerSession(request.headers)
   const result = assertAdmin(ses)

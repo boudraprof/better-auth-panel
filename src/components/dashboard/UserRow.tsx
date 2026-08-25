@@ -15,26 +15,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import type { User } from './types'
 import InputError from '#/components/InputError'
+import type { UserRowProps } from '#/types'
 
-type Props = {
-  user: User
-  selected: boolean
-  onToggleSelect: () => void
-  onViewDetails: (user: User) => void
-  onSetRole: (user: User, role: 'user' | 'admin') => void
-  onBan: (userId: string, reason?: string, expiresIn?: number) => void
-  onUnban: (userId: string) => void
-  /** When false, read-only rows hide selection + all mutating controls. */
-  canManage?: boolean
-}
 
-/**
- * A single row in the users table. The ban dialog owns its own reason/expiry
- * state (per-row, keyed by user id in the list) so a reason typed for one user
- * can never leak into another user's dialog.
- */
+
+
+
+
 export function UserRow({
   user,
   selected,
@@ -44,7 +32,8 @@ export function UserRow({
   onBan,
   onUnban,
   canManage = true,
-}: Props) {
+}: UserRowProps) {
+  
   const [busy, setBusy] = useState<string | null>(null)
 
   const banForm = useForm({

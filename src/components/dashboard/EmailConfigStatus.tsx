@@ -5,29 +5,12 @@ import { Mail, Settings2 } from 'lucide-react'
 import { Card, CardContent } from '#/components/ui/card'
 import { Badge } from '#/components/ui/badge'
 import api from '#/utils/axios'
+import { PROVIDER_LABELS } from '#/utils/constants'
+import type { EmailConfig } from '#/types'
 
-type EmailConfig = {
-  id: string
-  provider: string
-  smtpHost: string | null
-  smtpPort: number | null
-  smtpUser: string | null
-  fromEmail: string | null
-  fromName: string | null
-}
 
-const PROVIDER_LABELS: Record<string, string> = {
-  smtp: 'SMTP',
-  sendgrid: 'SendGrid',
-  resend: 'Resend',
-  mailgun: 'Mailgun',
-}
 
-/**
- * Compact read-only summary of the configured outbound email provider, shown on
- * the dashboard. Renders nothing (no card) until an email configuration has
- * actually been added, so the dashboard stays clean for fresh installs.
- */
+
 export function EmailConfigStatus() {
   const [config, setConfig] = useState<EmailConfig | null>(null)
   const [loading, setLoading] = useState(true)
@@ -51,7 +34,7 @@ export function EmailConfigStatus() {
 
   if (loading || !config) return null
 
-  const providerLabel = PROVIDER_LABELS[config.provider] ?? config.provider
+  const providerLabel = PROVIDER_LABELS[config.provider] || config.provider
 
   return (
     <Card>

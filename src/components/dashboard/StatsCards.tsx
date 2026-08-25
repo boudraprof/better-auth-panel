@@ -1,6 +1,9 @@
 import { MailCheck, Shield, UserPlus, UserX, Users } from 'lucide-react'
 import { Card, CardContent } from '#/components/ui/card'
-import type { AdminStats } from './types'
+import type { AdminStats } from '#/types'
+
+
+
 
 export function StatsCards({ stats }: { stats: AdminStats | null }) {
   return (

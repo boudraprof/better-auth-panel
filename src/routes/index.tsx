@@ -28,37 +28,23 @@ import {
 import { adminMiddleware } from '#/middleware/admin'
 import { TableSkeleton } from '#/components/LoadingSkeleton'
 import { BulkActionsBar } from '#/components/dashboard/BulkActionsBar'
-import type { BulkAction } from '#/components/dashboard/BulkActionsBar'
+import type { BulkAction } from '#/types'
 import { CreateUserDialog } from '#/components/dashboard/CreateUserDialog'
 import { GlobalSessionsDialog } from '#/components/dashboard/GlobalSessionsDialog'
 import { SeedUsersDialog } from '#/components/dashboard/SeedUsersDialog'
 import { StatsCards } from '#/components/dashboard/StatsCards'
 import { UserDetailDialog } from '#/components/dashboard/UserDetailDialog'
 import { UserRow } from '#/components/dashboard/UserRow'
-import type { AdminStats, User } from '#/components/dashboard/types'
+import type { AdminStats, User } from '#/types'
 import api from '#/utils/axios'
 import { useSession, authClient } from '#/utils/auth-client'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
+import type { ApiUser } from '#/types'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
 
 const { admin: adminApi } = authClient
 
-// The admin plugin's listUsers endpoint returns full user rows from the DB, but
-// its generated type omits `lastSeenAt`. The runtime response does include it
-// (internalAdapter.listUsers → findMany with no column projection), so we read
-// it through this widened shape.
-type ApiUser = {
-  id: string
-  name: string
-  email: string
-  role?: string | null
-  banned?: boolean | null
-  banReason?: string | null
-  banExpires?: string | null
-  emailVerified: boolean
-  image?: string | null
-  lastSeenAt?: Date | string | null
-  createdAt: Date | string
-}
+
 
 export const Route = createFileRoute('/')({
   server: {

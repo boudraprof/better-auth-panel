@@ -16,18 +16,11 @@ import {
 } from '#/components/ui/select'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
+import type { EmailConfig } from '#/types'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
 
-type EmailConfig = {
-  id: string
-  provider: string
-  smtpHost: string | null
-  smtpPort: number | null
-  smtpUser: string | null
-  smtpPass: string | null
-  fromEmail: string | null
-  fromName: string | null
-}
+
 
 export const Route = createFileRoute('/email-config')({
   server: {

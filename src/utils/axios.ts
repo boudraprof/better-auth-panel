@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { createIsomorphicFn } from '@tanstack/react-start'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
-import { env } from '#/env'
+import { env } from '#/utils/env'
 
 const api: AxiosInstance = axios.create({
   // Server (SSR in-process calls) needs an absolute URL. On the client we use a

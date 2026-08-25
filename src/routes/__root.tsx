@@ -17,8 +17,9 @@ import Header from '../components/Header'
 
 import appCss from '../styles.css?url'
 import { documentTitle, titleForPath } from '#/utils/app-name'
-import { isDemoMode } from '#/utils/demo-mode'
-import { matchPaths } from '#/utils/utils'
+import { isDemoMode, matchPaths } from '#/utils/utils'
+import NotFound from '#/components/NotFound'
+
 
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 
@@ -130,14 +131,4 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   )
 }
 
-function NotFound() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 p-8 text-center">
-      <p className="text-4xl font-bold">404</p>
-      <p className="text-lg font-medium">Page not found</p>
-      <p className="text-sm text-muted-foreground">
-        The page you're looking for doesn't exist or has been moved.
-      </p>
-    </div>
-  )
-}
+

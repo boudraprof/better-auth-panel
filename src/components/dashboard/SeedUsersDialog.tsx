@@ -14,7 +14,11 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import api from '#/utils/axios'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+
+
+
 
 export function SeedUsersDialog({ onSeeded }: { onSeeded: () => void }) {
   const [open, setOpen] = useState(false)

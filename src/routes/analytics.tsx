@@ -14,37 +14,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Button } from '#/components/ui/button'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
+import type { AnalyticsData } from '#/types'
+import { ACTION_LABELS, PIE_COLORS } from '#/utils/constants'
 
-const PIE_COLORS = ['#4fb8b2', '#328f97', '#e7b84f', '#e74f4f', '#6ec89a', '#afcdc8']
-
-type DailySignup = { date: string; count: number }
-type AuditBreakdown = { action: string; count: number }
-type RoleDist = { role: string; count: number }
-type SessionsPerDay = { date: string; count: number }
-type CumulativeGrowth = { date: string; count: number }
-
-type AnalyticsData = {
-  dailySignups: DailySignup[]
-  activeUsers: number
-  auditBreakdown: AuditBreakdown[]
-  newToday: number
-  roleDistribution: RoleDist[]
-  verifiedUsers: number
-  unverifiedUsers: number
-  bannedUsers: number
-  sessionsPerDay: SessionsPerDay[]
-  cumulativeGrowth: CumulativeGrowth[]
-  totalUsers: number
-}
-
-const ACTION_LABELS: Record<string, string> = {
-  'user.ban': 'Ban', 'user.unban': 'Unban', 'user.delete': 'Delete',
-  'user.set-role': 'Role Change', 'user.impersonate': 'Impersonate',
-  'user.stop-impersonating': 'Stop Impersonation', 'user.set-password': 'Set Password',
-  'user.create': 'Create User', 'user.update': 'Update User',
-  'user.email-verify': 'Verify Email', 'session.revoke': 'Revoke Session',
-  'users.seed': 'Seed Users', 'users.bulk-ban': 'Bulk Ban', 'users.bulk-delete': 'Bulk Delete',
-}
 
 export const Route = createFileRoute('/analytics')({
   server: { middleware: [adminMiddleware] },

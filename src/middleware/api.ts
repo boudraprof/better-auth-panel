@@ -1,6 +1,7 @@
 import { createMiddleware } from '@tanstack/react-start'
 import { getServerSession } from '#/utils/session'
 import { unauthorized } from '#/utils/utils'
+import type { AuthSession } from '#/types'
 
 export const apiAuthMiddleware = createMiddleware().server(
   async ({ next, request }) => {
@@ -14,16 +15,6 @@ export const apiAuthMiddleware = createMiddleware().server(
   },
 )
 
-export type AuthSession = NonNullable<
-  Awaited<ReturnType<typeof getServerSession>>
->
-
-/**
- * Result of `requireApiAuth`: either an error `Response` (unauthorized) OR a
- * non-null `session`. Discriminates on `response`. After `if (response) return`,
- * callers can use `session.session.userId` directly — `session` is the *non-null*
- * union member here.
- */
 export type RequireApiAuthResult =
   | { session: AuthSession; response: null }
   | { session: null; response: Response }

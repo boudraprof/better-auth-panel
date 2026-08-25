@@ -17,7 +17,11 @@ import {
 } from '#/components/ui/dialog'
 import { adminMiddleware } from '#/middleware/admin'
 import api from '#/utils/axios'
-import { DEMO_MODE_MESSAGE, isDemoMode } from '#/utils/demo-mode'
+import { isDemoMode } from '#/utils/utils'
+import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+
+
+
 
 type RateLimitEntry = {
   id: string

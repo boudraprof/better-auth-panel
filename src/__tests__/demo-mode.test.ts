@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { isDemoMode } from '#/utils/demo-mode'
+import { isDemoMode } from '#/utils/utils'
 
 describe('isDemoMode', () => {
   afterEach(() => {

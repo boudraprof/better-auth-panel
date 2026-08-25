@@ -1,18 +1,12 @@
 import { Ban, Loader2, Shield, Trash2 } from 'lucide-react'
 import { Button } from '#/components/ui/button'
+import type { BulkActionsBarProps } from '#/types'
 
-export type BulkAction = 'ban' | 'unban' | 'makeAdmin' | 'delete'
 
-type Props = {
-  count: number
-  loading: boolean
-  onClear: () => void
-  onAction: (action: BulkAction) => void
-  /** When false (non-admin viewer), no bulk actions are exposed. */
-  canManage?: boolean
-}
 
-export function BulkActionsBar({ count, loading, onClear, onAction, canManage = true }: Props) {
+
+
+export function BulkActionsBar({ count, loading, onClear, onAction, canManage = true }:  BulkActionsBarProps) {
   if (!canManage) return null
   return (
     <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-4 py-2">

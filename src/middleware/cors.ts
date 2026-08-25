@@ -1,4 +1,4 @@
-import { getAllowedOrigins } from '#/env'
+import { getAllowedOrigins } from '#/utils/env'
 
 export const corsHeaders = (origin: string | null): Record<string, string> => {
   const allowedOrigins = getAllowedOrigins()
