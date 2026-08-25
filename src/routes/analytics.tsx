@@ -13,9 +13,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Button } from '#/components/ui/button'
 import { adminMiddleware } from '#/middleware/admin'
-import api from '#/utils/axios'
+import { getAnalytics } from '#/utils/admin-api'
 import type { AnalyticsData } from '#/types'
-import { ACTION_LABELS, PIE_COLORS } from '#/utils/constants'
+import { PIE_COLORS } from '#/utils/constants'
+import { ACTION_LABELS } from '#/utils/audit-actions'
 
 
 export const Route = createFileRoute('/analytics')({
@@ -30,7 +31,7 @@ function AnalyticsPage() {
   const fetchAnalytics = useCallback(async () => {
     setLoading(true)
     try {
-      const { data: analytics } = await api.get<AnalyticsData>('/admin/analytics')
+      const analytics = await getAnalytics<AnalyticsData>()
       setData(analytics)
     } catch { toast.error('Failed to fetch analytics') }
     finally { setLoading(false) }

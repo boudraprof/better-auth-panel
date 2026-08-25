@@ -2,15 +2,7 @@ import { env } from '#/utils/env'
 
 const BASE_URL = env.BETTER_AUTH_BASE_URL
 
-export function parseRequestSearchParams(request: Request): URLSearchParams {
-  const url = request.url || ''
-  const qs = url.includes('?') ? url.split('?')[1] : ''
-  return new URLSearchParams(qs)
-}
-
-
-
-export function ensureAbsoluteUrl(url: string): string {
+function ensureAbsoluteUrl(url: string): string {
   if (!url) return BASE_URL
   if (url.startsWith('http://') || url.startsWith('https://')) return url
   return `${BASE_URL}${url.startsWith('/') ? url : `/${url}`}`

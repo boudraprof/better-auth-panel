@@ -9,10 +9,10 @@ import { APIError, betterAuth } from 'better-auth'
 import { env, getTrustedOrigins } from '#/utils/env'
 import { db, dbDriver, schema } from '#/utils/config'
 import { audit } from '#/utils/audit'
-import { isDemoMode } from '#/utils/utils'
 import { sendEmail } from '#/utils/email'
 import { ac, roles } from '#/utils/org-access'
-import { ADMIN_ACTIONS, DEMO_BLOCKED_PATHS, DEMO_MODE_MESSAGE } from './constants'
+import { ADMIN_ACTIONS } from './audit-actions'
+import { canMutate, DEMO_MODE_MESSAGE } from './demo-mode'
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_BASE_URL,
@@ -211,7 +211,7 @@ export const auth = betterAuth({
   ],
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      if (isDemoMode() && DEMO_BLOCKED_PATHS.has(ctx.path)) {
+      if (!canMutate(ctx.path)) {
         throw new APIError('FORBIDDEN', {
           message: DEMO_MODE_MESSAGE,
         })

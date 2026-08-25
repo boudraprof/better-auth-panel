@@ -17,7 +17,8 @@ import Header from '../components/Header'
 
 import appCss from '../styles.css?url'
 import { documentTitle, titleForPath } from '#/utils/app-name'
-import { isDemoMode, matchPaths } from '#/utils/utils'
+import { matchPaths } from '#/utils/utils'
+import { isDemoMode } from '#/utils/demo-mode'
 import NotFound from '#/components/NotFound'
 
 

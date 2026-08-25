@@ -15,10 +15,9 @@ import {
   SelectValue,
 } from '#/components/ui/select'
 import { adminMiddleware } from '#/middleware/admin'
-import api from '#/utils/axios'
+import { saveEmailConfig, testEmailConfig, getEmailConfig } from '#/utils/admin-api'
 import type { EmailConfig } from '#/types'
-import { isDemoMode } from '#/utils/utils'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 
 
@@ -33,11 +32,7 @@ function EmailConfigPage() {
   const [config, setConfig] = useState<EmailConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   // Form fields
   const [provider, setProvider] = useState('smtp')
@@ -51,7 +46,7 @@ function EmailConfigPage() {
   const fetchConfig = useCallback(async () => {
     setLoading(true)
     try {
-      const { data } = await api.get<{ data: EmailConfig | null }>('/admin/email-config')
+      const data = await getEmailConfig<EmailConfig>()
       const cfg = data.data
       setConfig(cfg)
       if (cfg) {
@@ -75,13 +70,10 @@ function EmailConfigPage() {
   }, [fetchConfig])
 
   const handleSave = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     setSaving(true)
     try {
-      await api.post('/admin/email-config', {
+      await saveEmailConfig({
         provider,
         smtpHost: smtpHost.trim() || undefined,
         smtpPort: smtpPort ? parseInt(smtpPort, 10) : undefined,
@@ -100,18 +92,15 @@ function EmailConfigPage() {
   }
 
   const handleTest = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     const testEmail = prompt('Send test email to:')
     if (!testEmail || !testEmail.includes('@')) return
     try {
-      const res = await api.post('/admin/email-config/test', { to: testEmail })
-      if (res.data?.success) {
+      const res = await testEmailConfig(testEmail)
+      if (res?.success) {
         toast.success('Test email sent!')
       } else {
-        toast.error(res.data?.error || 'Failed to send test email')
+        toast.error(res?.error || 'Failed to send test email')
       }
     } catch {
       toast.error('Failed to send test email')

@@ -15,26 +15,6 @@ export type NavItem = {
 
 export type Role = 'admin' | 'user'
 
-export type Permission =
-  | 'user:read'
-  | 'user:write'
-  | 'user:ban'
-  | 'user:delete'
-  | 'user:role'
-  | 'user:impersonate'
-  | 'session:read'
-  | 'session:revoke'
-  | 'org:read'
-  | 'org:delete'
-  | 'audit:read'
-  | 'analytics:read'
-  | 'settings:email'
-  | 'settings:security'
-  | 'hardware:read'
-  | 'ratelimit:read'
-  | 'ratelimit:clear'
-  | 'seed:users'
-
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 export interface ErrorContext {

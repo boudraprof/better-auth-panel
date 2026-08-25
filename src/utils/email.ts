@@ -10,12 +10,7 @@ async function loadConfig() {
   return config || null
 }
 
-export function clearTransporterCache() {
-  transporter = null
-  cachedConfig = null
-}
-
-export async function getTransporter() {
+async function getTransporter() {
   const config = await loadConfig()
   if (!config || !config.smtpHost) return null
 

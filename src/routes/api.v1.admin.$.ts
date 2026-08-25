@@ -1,7 +1,6 @@
 import { randomBytes } from 'node:crypto'
 import { createFileRoute } from '@tanstack/react-router'
-import { and, count, desc, eq, gte, inArray, sql } from 'drizzle-orm'
-import si from 'systeminformation'
+import { desc, eq, inArray } from 'drizzle-orm'
 
 import { db, schema } from '#/utils/config'
 import { corsJson, withCors } from '#/middleware/cors'
@@ -9,10 +8,19 @@ import { getServerSession } from '#/utils/session'
 import { auth } from '#/utils/auth'
 import { requestUrl } from '#/utils/url'
 import { assertAdmin } from '#/utils/admin'
-import { isDemoMode, isUrlPath } from '#/utils/utils'
+import { isUrlPath } from '#/utils/utils'
 import { audit } from '#/utils/audit'
 import logger from '#/utils/logger'
-import { ADMIN_CUSTOM_PATHS, DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { ADMIN_CUSTOM_PATHS } from '#/utils/admin-paths'
+import { canMutateAdmin, DEMO_MODE_MESSAGE } from '#/utils/demo-mode'
+import {
+  handleAdminGet,
+  handleAdminPost,
+  hasGetHandler,
+  hasPostHandler,
+  runAdminHandler,
+} from '#/server/admin/dispatch'
+import { getStats } from '#/server/admin/endpoints/stats'
 
 
 
@@ -122,897 +130,41 @@ export const Route = createFileRoute('/api/v1/admin/$')({
 
         if (response) return response
 
-        const userId = url.searchParams.get('userId')
-
-        /*
-         * Accounts
-         */
-        if (isUrlPath(url, 'accounts')) {
-          if (!userId) {
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'userId is required',
-              },
-              { status: 400 },
-            )
-          }
-
-          try {
-            const accounts = await db
-              .select({
-                id: schema.account.id,
-                provider: schema.account.providerId,
-                accountId: schema.account.accountId,
-                createdAt: schema.account.createdAt,
-              })
-              .from(schema.account)
-              .where(eq(schema.account.userId, userId))
-              .orderBy(schema.account.createdAt)
-
-            return corsJson(request, { data: accounts }, { status: 200 })
-          } catch (error) {
-            logger.error('Failed to fetch accounts', error, 'Admin')
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch accounts',
-              },
-              { status: 500 },
-            )
-          }
+        // Migrated endpoints dispatch through the registry first; anything
+        // else falls through to the legacy inline branches below.
+        if (hasGetHandler(url.pathname)) {
+          return handleAdminGet(request)
         }
 
         /*
          * Global sessions
          */
-        if (isUrlPath(url, 'sessions')) {
-          const userIdFilter = url.searchParams.get('userId')
-
-          try {
-            const rows = await db
-              .select({
-                id: schema.session.id,
-                userId: schema.session.userId,
-                ipAddress: schema.session.ipAddress,
-                userAgent: schema.session.userAgent,
-                impersonatedBy: schema.session.impersonatedBy,
-                createdAt: schema.session.createdAt,
-                expiresAt: schema.session.expiresAt,
-              })
-              .from(schema.session)
-              .where(
-                userIdFilter
-                  ? eq(schema.session.userId, userIdFilter)
-                  : undefined,
-              )
-              .orderBy(schema.session.createdAt)
-
-            return corsJson(request, { data: rows }, { status: 200 })
-          } catch (error) {
-            logger.error('Failed to fetch sessions', error, 'Admin')
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch sessions',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
         /*
          * Audit logs
          */
-        if (isUrlPath(url, 'audit-logs')) {
-          const page = parseInt(url.searchParams.get('page') || '0')
-          const limit = parseInt(url.searchParams.get('limit') || '50')
-          const action = url.searchParams.get('action')
-          const actorId = url.searchParams.get('actorId')
-          const offset = page * limit
-
-          try {
-            const whereConditions = []
-
-            if (action) {
-              whereConditions.push(eq(schema.auditLog.action, action))
-            }
-
-            if (actorId) {
-              whereConditions.push(eq(schema.auditLog.actorId, actorId))
-            }
-
-            const where =
-              whereConditions.length > 0
-                ? and(...whereConditions)
-                : undefined
-
-            const [totalResult] = await db
-              .select({ total: count() })
-              .from(schema.auditLog)
-              .where(where)
-
-            const logs = await db
-              .select()
-              .from(schema.auditLog)
-              .where(where)
-              .orderBy(desc(schema.auditLog.createdAt))
-              .limit(limit)
-              .offset(offset)
-
-            return corsJson(
-              request,
-              {
-                data: logs,
-                total: totalResult.total,
-              },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error('Failed to fetch audit logs', error, 'Admin')
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch audit logs',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
         /*
          * Analytics
          */
-        if (isUrlPath(url, 'analytics')) {
-          try {
-            const now = new Date()
-            const thirtyDaysAgo = new Date(
-              now.getTime() - 30 * 24 * 60 * 60 * 1000,
-            )
-            const sevenDaysAgo = new Date(
-              now.getTime() - 7 * 24 * 60 * 60 * 1000,
-            )
-            const yesterday = new Date(
-              now.getTime() - 24 * 60 * 60 * 1000,
-            )
-
-            const [
-              dailySignupsResult,
-              activeUsersResult,
-              auditBreakdownResult,
-              newTodayResult,
-              roleDistResult,
-              verifiedResult,
-              bannedResult,
-              sessionsPerDayResult,
-              cumulativeGrowthResult,
-              totalUsersResult,
-            ] = await Promise.all([
-              db
-                .select({
-                  date: sql<string>`DATE(${schema.user.createdAt})`,
-                  count: count(),
-                })
-                .from(schema.user)
-                .where(gte(schema.user.createdAt, thirtyDaysAgo))
-                .groupBy(sql`DATE(${schema.user.createdAt})`)
-                .orderBy(sql`DATE(${schema.user.createdAt})`)
-                .catch(() => []),
-
-              db
-                .select({ count: count() })
-                .from(schema.session)
-                .where(gte(schema.session.createdAt, sevenDaysAgo))
-                .then(
-                  (r: Array<{ count: number }>) =>
-                    r[0]?.count ?? 0,
-                )
-                .catch(() => 0),
-
-              db
-                .select({
-                  action: schema.auditLog.action,
-                  count: count(),
-                })
-                .from(schema.auditLog)
-                .groupBy(schema.auditLog.action)
-                .orderBy(desc(count()))
-                .catch(() => []),
-
-              db
-                .select({ count: count() })
-                .from(schema.user)
-                .where(gte(schema.user.createdAt, yesterday))
-                .then(
-                  (r: Array<{ count: number }>) =>
-                    r[0]?.count ?? 0,
-                )
-                .catch(() => 0),
-
-              db
-                .select({
-                  role: schema.user.role,
-                  count: count(),
-                })
-                .from(schema.user)
-                .groupBy(schema.user.role)
-                .orderBy(desc(count()))
-                .catch(() => []),
-
-              db
-                .select({ count: count() })
-                .from(schema.user)
-                .where(eq(schema.user.emailVerified, true))
-                .then(
-                  (r: Array<{ count: number }>) =>
-                    r[0]?.count ?? 0,
-                )
-                .catch(() => 0),
-
-              db
-                .select({ count: count() })
-                .from(schema.user)
-                .where(eq(schema.user.banned, true))
-                .then(
-                  (r: Array<{ count: number }>) =>
-                    r[0]?.count ?? 0,
-                )
-                .catch(() => 0),
-
-              db
-                .select({
-                  date: sql<string>`DATE(${schema.session.createdAt})`,
-                  count: count(),
-                })
-                .from(schema.session)
-                .where(gte(schema.session.createdAt, thirtyDaysAgo))
-                .groupBy(sql`DATE(${schema.session.createdAt})`)
-                .orderBy(sql`DATE(${schema.session.createdAt})`)
-                .catch(() => []),
-
-              db
-                .select({
-                  date: sql<string>`DATE(${schema.user.createdAt})`,
-                  count: count(),
-                })
-                .from(schema.user)
-                .groupBy(sql`DATE(${schema.user.createdAt})`)
-                .orderBy(sql`DATE(${schema.user.createdAt})`)
-                .catch(() => []),
-
-              db
-                .select({ count: count() })
-                .from(schema.user)
-                .then(
-                  (r: Array<{ count: number }>) =>
-                    r[0]?.count ?? 0,
-                )
-                .catch(() => 0),
-            ])
-
-            let runningTotal = 0
-
-            const cumulativeGrowth = cumulativeGrowthResult.map(
-              (row: { date: string; count: number }) => {
-                runningTotal += row.count
-
-                return {
-                  date: row.date,
-                  count: runningTotal,
-                }
-              },
-            )
-
-            const totalVerified = verifiedResult
-            const totalUnverified =
-              totalUsersResult - totalVerified
-
-            return corsJson(
-              request,
-              {
-                dailySignups: dailySignupsResult,
-                activeUsers: activeUsersResult,
-                auditBreakdown: auditBreakdownResult,
-                newToday: newTodayResult,
-                roleDistribution: roleDistResult,
-                verifiedUsers: totalVerified,
-                unverifiedUsers: totalUnverified,
-                bannedUsers: bannedResult,
-                sessionsPerDay: sessionsPerDayResult,
-                cumulativeGrowth,
-                totalUsers: totalUsersResult,
-              },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Analytics query failed',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                dailySignups: [],
-                activeUsers: 0,
-                auditBreakdown: [],
-                newToday: 0,
-                roleDistribution: [],
-                verifiedUsers: 0,
-                unverifiedUsers: 0,
-                bannedUsers: 0,
-                sessionsPerDay: [],
-                cumulativeGrowth: [],
-                totalUsers: 0,
-              },
-              { status: 200 },
-            )
-          }
-        }
-
         /*
          * Email config
          */
-        if (isUrlPath(url, 'email-config')) {
-          try {
-            const config = await db
-              .select()
-              .from(schema.emailConfig)
-              .limit(1)
-
-            return corsJson(
-              request,
-              {
-                data: config[0] || null,
-              },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Failed to fetch email config',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch email config',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
         /*
          * User activity
          */
-        if (isUrlPath(url, 'user-activity')) {
-          const activityUserId = url.searchParams.get('userId')
-
-          if (!activityUserId) {
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'userId is required',
-              },
-              { status: 400 },
-            )
-          }
-
-          try {
-            const logs = await db
-              .select()
-              .from(schema.auditLog)
-              .where(
-                eq(
-                  schema.auditLog.targetId,
-                  activityUserId,
-                ),
-              )
-              .orderBy(desc(schema.auditLog.createdAt))
-              .limit(100)
-
-            return corsJson(
-              request,
-              { data: logs },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Failed to fetch user activity',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch activity',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
         /*
          * Rate limits
          */
-        if (isUrlPath(url, 'rate-limits')) {
-          try {
-            const entries = await db
-              .select()
-              .from(schema.rateLimit)
-              .orderBy(desc(schema.rateLimit.lastRequest))
-              .limit(200)
-
-            return corsJson(
-              request,
-              { data: entries },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Failed to fetch rate limits',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch rate limits',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
         /*
          * Organizations
          */
-        if (
-          isUrlPath(url, 'organizations') &&
-          !isUrlPath(url, 'organizations/members')
-        ) {
-          try {
-            const orgs = await db
-              .select({
-                id: schema.organization.id,
-                name: schema.organization.name,
-                slug: schema.organization.slug,
-                logo: schema.organization.logo,
-                createdAt: schema.organization.createdAt,
-                updatedAt: schema.organization.updatedAt,
-              })
-              .from(schema.organization)
-              .orderBy(
-                desc(schema.organization.createdAt),
-              )
-
-            const memberCounts = await db
-              .select({
-                organizationId:
-                  schema.member.organizationId,
-                count: count(),
-              })
-              .from(schema.member)
-              .groupBy(schema.member.organizationId)
-
-            const countMap = new Map(
-              memberCounts.map(
-                (row: {
-                  organizationId: string
-                  count: number
-                }) => [
-                  row.organizationId,
-                  row.count,
-                ],
-              ),
-            )
-
-            return corsJson(
-              request,
-              {
-                data: orgs.map(
-                  (org: {
-                    id: string
-                    name: string
-                    slug: string
-                    logo: string | null
-                    createdAt: Date
-                    updatedAt: Date
-                  }) => ({
-                    ...org,
-                    memberCount:
-                      countMap.get(org.id) ?? 0,
-                  }),
-                ),
-              },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Failed to fetch organizations',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message:
-                  'Failed to fetch organizations',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
         /*
          * Organization members
          */
-        if (isUrlPath(url, 'organizations/members')) {
-          const orgId = url.searchParams.get('orgId')
-
-          if (!orgId) {
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'orgId is required',
-              },
-              { status: 400 },
-            )
-          }
-
-          try {
-            const members = await db
-              .select({
-                id: schema.member.id,
-                role: schema.member.role,
-                createdAt: schema.member.createdAt,
-                userId: schema.member.userId,
-                name: schema.user.name,
-                email: schema.user.email,
-                image: schema.user.image,
-              })
-              .from(schema.member)
-              .innerJoin(
-                schema.user,
-                eq(
-                  schema.member.userId,
-                  schema.user.id,
-                ),
-              )
-              .where(
-                eq(
-                  schema.member.organizationId,
-                  orgId,
-                ),
-              )
-              .orderBy(schema.member.createdAt)
-
-            return corsJson(
-              request,
-              { data: members },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Failed to fetch organization members',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to fetch members',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
-        /*
-         * Hardware / system status
-         *
-         * Uses systeminformation instead of node:os + df.
-         * This makes the endpoint much more portable across
-         * Linux, Windows and macOS.
-         */
-        if (isUrlPath(url, 'hardware')) {
-          try {
-            const [
-              osInfo,
-              cpu,
-              mem,
-              fsSize,
-              load,
-              time,
-            ] = await Promise.all([
-              si.osInfo(),
-              si.cpu(),
-              si.mem(),
-              si.fsSize(),
-              si.currentLoad(),
-              si.time(),
-            ])
-
-            // Prefer the root filesystem on Unix systems.
-            // On Windows systeminformation normally reports
-            // the available drive as well.
-            const rootDisk =
-              fsSize.find(
-                (disk) =>
-                  disk.mount === '/' ||
-                  disk.mount === 'C:\\',
-              ) ?? fsSize[0]
-
-            const uptimeSeconds = time.uptime
-
-            const days = Math.floor(
-              uptimeSeconds / 86400,
-            )
-
-            const hours = Math.floor(
-              (uptimeSeconds % 86400) / 3600,
-            )
-
-            const minutes = Math.floor(
-              (uptimeSeconds % 3600) / 60,
-            )
-
-            const seconds = Math.floor(
-              uptimeSeconds % 60,
-            )
-
-            return corsJson(
-              request,
-              {
-                hostname: osInfo.hostname,
-                platform: osInfo.platform,
-                distro: osInfo.distro,
-                release: osInfo.release,
-                arch: osInfo.arch,
-                kernel: osInfo.kernel,
-                nodeVersion: process.version,
-
-                uptime: {
-                  days,
-                  hours,
-                  minutes,
-                  seconds,
-                },
-
-                cpu: {
-                  model: cpu.brand || 'N/A',
-                  manufacturer:
-                    cpu.manufacturer || 'N/A',
-                  cores: cpu.cores,
-                  physicalCores:
-                    cpu.physicalCores,
-                  speed: cpu.speed,
-
-                  loadPercent: Math.round(
-                    load.currentLoad,
-                  ),
-
-                  userPercent: Math.round(
-                    load.currentLoadUser,
-                  ),
-
-                  systemPercent: Math.round(
-                    load.currentLoadSystem,
-                  ),
-                },
-
-                memory: {
-                  total: mem.total,
-                  used: mem.used,
-                  free: mem.free,
-                  available: mem.available,
-                  percent: Math.round(
-                    (mem.used / mem.total) * 100,
-                  ),
-                },
-
-                disk: rootDisk
-                  ? {
-                      filesystem: rootDisk.fs,
-                      mount: rootDisk.mount,
-                      total: rootDisk.size,
-                      used: rootDisk.used,
-                      free: rootDisk.available,
-                      percent: Math.round(
-                        rootDisk.use,
-                      ),
-                    }
-                  : null,
-              },
-              { status: 200 },
-            )
-          } catch (error) {
-            logger.error(
-              'Failed to fetch hardware status',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message:
-                  'Failed to fetch hardware status',
-              },
-              { status: 500 },
-            )
-          }
-        }
-
-        /*
-         * Export users as CSV
-         */
-        if (isUrlPath(url, 'export-users')) {
-          try {
-            const users = await db
-              .select({
-                id: schema.user.id,
-                name: schema.user.name,
-                email: schema.user.email,
-                role: schema.user.role,
-                emailVerified:
-                  schema.user.emailVerified,
-                banned: schema.user.banned,
-                banReason: schema.user.banReason,
-                lastSeenAt:
-                  schema.user.lastSeenAt,
-                createdAt: schema.user.createdAt,
-              })
-              .from(schema.user)
-              .orderBy(schema.user.createdAt)
-
-            const csvHeader =
-              'ID,Name,Email,Role,Email Verified,Banned,Ban Reason,Last Seen,Created At'
-
-            const csvRows = users.map(
-              (u: {
-                id: string
-                name: string | null
-                email: string
-                role: string | null
-                emailVerified: boolean
-                banned: boolean
-                banReason: string | null
-                lastSeenAt: Date | null
-                createdAt: Date
-              }) =>
-                [
-                  u.id,
-                  `"${(u.name || '').replace(
-                    /"/g,
-                    '""',
-                  )}"`,
-                  u.email,
-                  u.role,
-                  u.emailVerified ? 'Yes' : 'No',
-                  u.banned ? 'Yes' : 'No',
-                  `"${(u.banReason || '').replace(
-                    /"/g,
-                    '""',
-                  )}"`,
-                  u.lastSeenAt
-                    ? new Date(
-                        u.lastSeenAt,
-                      ).toISOString()
-                    : '',
-                  new Date(
-                    u.createdAt,
-                  ).toISOString(),
-                ].join(','),
-            )
-
-            const csv = [
-              csvHeader,
-              ...csvRows,
-            ].join('\n')
-
-            return new Response(csv, {
-              status: 200,
-              headers: {
-                'Content-Type': 'text/csv',
-                'Content-Disposition':
-                  'attachment; filename="users-export.csv"',
-                'Access-Control-Allow-Origin': '*',
-              },
-            })
-          } catch (error) {
-            logger.error(
-              'Failed to export users',
-              error,
-              'Admin',
-            )
-
-            return corsJson(
-              request,
-              {
-                error: true,
-                message: 'Failed to export users',
-              },
-              { status: 500 },
-            )
-          }
-        }
 
         /*
          * Default: stats
          */
-        try {
-          const since = new Date(
-            Date.now() - 24 * 60 * 60 * 1000,
-          )
-
-          const [row] = await db
-            .select({
-              total: count(),
-              admins: count(
-                sql`CASE WHEN ${schema.user.role} = 'admin' THEN 1 END`,
-              ),
-              verified: count(
-                sql`CASE WHEN ${schema.user.emailVerified} = true THEN 1 END`,
-              ),
-              banned: count(
-                sql`CASE WHEN ${schema.user.banned} = true THEN 1 END`,
-              ),
-              recentUsers: count(
-                sql`CASE WHEN ${schema.user.createdAt} >= ${since.toISOString()} THEN 1 END`,
-              ),
-            })
-            .from(schema.user)
-
-          return corsJson(
-            request,
-            {
-              total: row.total,
-              admins: row.admins,
-              verified: row.verified,
-              banned: row.banned,
-              recentUsers: row.recentUsers,
-            },
-            { status: 200 },
-          )
-        } catch (error) {
-          logger.error(
-            'Failed to fetch stats',
-            error,
-            'Admin',
-          )
-
-          return corsJson(
-            request,
-            {
-              error: true,
-              message: 'Failed to fetch stats',
-            },
-            { status: 500 },
-          )
-        }
+        return runAdminHandler(request, (ctx) => getStats(ctx))
       },
 
       POST: async ({ request }) => {
@@ -1020,10 +172,7 @@ export const Route = createFileRoute('/api/v1/admin/$')({
 
         // Forward Better Auth's own admin endpoints
         if (!ADMIN_CUSTOM_PATHS.has(url.pathname)) {
-          return withCors(
-            await auth.handler(requestUrl(request)),
-            request,
-          )
+          return withCors(await auth.handler(requestUrl(request)), request)
         }
 
         const {
@@ -1041,12 +190,54 @@ export const Route = createFileRoute('/api/v1/admin/$')({
         // POST endpoint that is read-only (it just queries the audit log) is
         // `user-activity`, which we deliberately allow so the demo stays
         // browseable. Everything else writes to the database.
-        if (isDemoMode() && !isUrlPath(url, 'user-activity')) {
+        if (!canMutateAdmin(url.pathname)) {
           return corsJson(
             request,
             { error: true, message: DEMO_MODE_MESSAGE },
             { status: 403 },
           )
+        }
+
+        // Migrated endpoints dispatch through the registry first; anything
+        // else falls through to the legacy inline branches below.
+        if (hasPostHandler(url.pathname)) {
+          return handleAdminPost(request)
+        }
+
+        /*
+         * Check whether an email is already taken (used by CreateUserDialog)
+         */
+        if (isUrlPath(url, 'check-email')) {
+          const email = body.email as string | undefined
+
+          if (!email) {
+            return corsJson(
+              request,
+              { error: true, message: 'email is required' },
+              { status: 400 },
+            )
+          }
+
+          try {
+            const [existing] = await db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.email, email))
+              .limit(1)
+
+            return corsJson(
+              request,
+              { exists: Boolean(existing) },
+              { status: 200 },
+            )
+          } catch (error) {
+            logger.error('Failed to check email', error, 'Admin')
+            return corsJson(
+              request,
+              { error: true, message: 'Failed to check email' },
+              { status: 500 },
+            )
+          }
         }
 
         /*

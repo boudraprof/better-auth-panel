@@ -1,5 +1,6 @@
 import type { ErrorContext, TrackedError } from "#/types"
-import { MAX_QUEUE_SIZE } from "./constants"
+
+const MAX_QUEUE_SIZE = 50
 
 const errorQueue: TrackedError[] = []
 
@@ -54,28 +55,6 @@ export function trackError(error: Error | unknown, context: ErrorContext = {}): 
   }
 }
 
-export function trackAndLogError(
-  error: Error | unknown,
-  context: ErrorContext = {}
-): void {
-  trackError(error, context)
-
-  if (import.meta.env.DEV) {
-    console.error('[Error]', error, context)
-  }
-}
-
-export function createErrorBoundaryHandler(componentName: string) {
-  return (error: Error, errorInfo: React.ErrorInfo) => {
-    trackError(error, {
-      component: componentName,
-      metadata: {
-        componentStack: errorInfo.componentStack,
-      },
-    })
-  }
-}
-
 async function flushQueue(): Promise<void> {
   if (errorQueue.length === 0) return
   const errorsToSend = [...errorQueue]
@@ -85,12 +64,4 @@ async function flushQueue(): Promise<void> {
   } catch {
     // Don't let tracking errors break the app
   }
-}
-
-export function getQueuedErrors(): TrackedError[] {
-  return [...errorQueue]
-}
-
-export function clearErrorQueue(): void {
-  errorQueue.length = 0
 }

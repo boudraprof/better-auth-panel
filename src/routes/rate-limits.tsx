@@ -16,9 +16,9 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import { adminMiddleware } from '#/middleware/admin'
-import api from '#/utils/axios'
-import { isDemoMode } from '#/utils/utils'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { clearRateLimits, listRateLimits } from '#/utils/admin-api'
+
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 
 
@@ -41,16 +41,12 @@ function RateLimitsPage() {
   const [entries, setEntries] = useState<RateLimitEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [clearing, setClearing] = useState(false)
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   const fetchEntries = useCallback(async () => {
     setLoading(true)
     try {
-      const { data } = await api.get<{ data?: RateLimitEntry[] }>('/admin/rate-limits')
+      const data = await listRateLimits<RateLimitEntry>()
       setEntries(data.data || [])
     } catch {
       toast.error('Failed to fetch rate limits')
@@ -64,13 +60,10 @@ function RateLimitsPage() {
   }, [fetchEntries])
 
   const handleClear = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     setClearing(true)
     try {
-      await api.post('/admin/rate-limits', { action: 'clear' })
+      await clearRateLimits()
       toast.success('Rate limits cleared')
       setEntries([])
     } catch {
