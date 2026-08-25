@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isUrlPath, cn, convertToBool } from '#/utils/utils'
+import { isUrlPath, cn } from '#/utils/utils'
 
 describe('isUrlPath', () => {
   it('matches when path is contained in URL', () => {
@@ -15,21 +15,6 @@ describe('isUrlPath', () => {
   it('matches nested paths', () => {
     const url = new URL('http://localhost:8000/v1/api/admin/sessions/revoke')
     expect(isUrlPath(url, 'sessions/revoke')).toBe(true)
-  })
-})
-
-describe('convertToBool', () => {
-  it.each(['true', 'True', 'TRUE'])('returns true for %s', (value) => {
-    expect(convertToBool(value)).toBe(true)
-  })
-
-  it.each(['false', 'False', 'FALSE'])('returns false for %s', (value) => {
-    expect(convertToBool(value)).toBe(false)
-  })
-
-  it.each(['yes', '1', '', 'tru'])('returns false for invalid value %s', (value) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(convertToBool(value as any)).toBe(false)
   })
 })
 

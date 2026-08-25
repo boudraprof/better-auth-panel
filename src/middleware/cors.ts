@@ -1,6 +1,6 @@
 import { getAllowedOrigins } from '#/utils/env'
 
-export const corsHeaders = (origin: string | null): Record<string, string> => {
+const corsHeaders = (origin: string | null): Record<string, string> => {
   const allowedOrigins = getAllowedOrigins()
   const o =
     origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0]
@@ -36,27 +36,3 @@ export const corsJson = (
   return new Response(JSON.stringify(data), { ...init, headers })
 }
 
-/**
- * Reject cross-origin requests whose `Origin` is not in the allow-list.
- *
- * Browsers always send an `Origin` header on cross-origin requests (and on
- * same-origin POST/PUT/DELETE), so a present-but-unlisted origin is a clear
- * signal the call is coming from outside the app and should be blocked. A
- * missing `Origin` (e.g. a same-origin GET, or a non-browser client) is
- * allowed through — this guard is about stopping *other web apps*, not
- * server-to-server traffic.
- *
- * Returns a 403 `Response` to short-circuit, or `null` when the request may
- * proceed.
- */
-export function originGuard(request: Request): Response | null {
-  const origin = request.headers.get('origin')
-  if (origin && !getAllowedOrigins().includes(origin)) {
-    return corsJson(
-      request,
-      { error: true, message: 'Origin not allowed' },
-      { status: 403 },
-    )
-  }
-  return null
-}

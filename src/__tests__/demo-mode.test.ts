@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { isDemoMode } from '#/utils/utils'
+import { canMutate, canMutateAdmin, isDemoMode } from '#/utils/demo-mode'
 
 describe('isDemoMode', () => {
   afterEach(() => {
@@ -31,5 +31,51 @@ describe('isDemoMode', () => {
   it('honours the VITE_DEMO_MODE override', () => {
     process.env.VITE_DEMO_MODE = 'false'
     expect(isDemoMode()).toBe(false)
+  })
+})
+
+describe('canMutate', () => {
+  afterEach(() => {
+    delete process.env.DEMO_MODE
+    delete process.env.VITE_DEMO_MODE
+  })
+
+  it('allows everything when not in demo mode', () => {
+    process.env.DEMO_MODE = 'false'
+    expect(canMutate('/admin/ban-user')).toBe(true)
+    expect(canMutate('/api/v1/admin/bulk-actions')).toBe(true)
+  })
+
+  it('blocks Better Auth mutation paths', () => {
+    expect(canMutate('/admin/ban-user')).toBe(false)
+    expect(canMutate('/change-password')).toBe(false)
+    expect(canMutate('/organization/delete')).toBe(false)
+  })
+
+  it('allows non-mutating paths (sign-in, reads)', () => {
+    expect(canMutate('/sign-in/email')).toBe(true)
+    expect(canMutate('/api/v1/admin/list-sessions')).toBe(true)
+  })
+})
+
+describe('canMutateAdmin', () => {
+  afterEach(() => {
+    delete process.env.DEMO_MODE
+    delete process.env.VITE_DEMO_MODE
+  })
+
+  it('allows everything when not in demo mode', () => {
+    process.env.DEMO_MODE = 'false'
+    expect(canMutateAdmin('/api/v1/admin/seed-users')).toBe(true)
+    expect(canMutateAdmin('/api/v1/admin/stats')).toBe(true)
+  })
+
+  it('blocks mutating custom admin endpoints', () => {
+    expect(canMutateAdmin('/api/v1/admin/seed-users')).toBe(false)
+    expect(canMutateAdmin('/api/v1/admin/bulk-actions')).toBe(false)
+  })
+
+  it('allows read-only custom admin endpoints', () => {
+    expect(canMutateAdmin('/api/v1/admin/user-activity')).toBe(true)
   })
 })

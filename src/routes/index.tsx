@@ -28,19 +28,16 @@ import {
 import { adminMiddleware } from '#/middleware/admin'
 import { TableSkeleton } from '#/components/LoadingSkeleton'
 import { BulkActionsBar } from '#/components/dashboard/BulkActionsBar'
-import type { BulkAction } from '#/types'
+import type { BulkAction, AdminStats, User , ApiUser  } from '#/types'
 import { CreateUserDialog } from '#/components/dashboard/CreateUserDialog'
 import { GlobalSessionsDialog } from '#/components/dashboard/GlobalSessionsDialog'
 import { SeedUsersDialog } from '#/components/dashboard/SeedUsersDialog'
 import { StatsCards } from '#/components/dashboard/StatsCards'
 import { UserDetailDialog } from '#/components/dashboard/UserDetailDialog'
 import { UserRow } from '#/components/dashboard/UserRow'
-import type { AdminStats, User } from '#/types'
-import api from '#/utils/axios'
+import { setRole, bulkAction, exportUsersCsv, getStats } from '#/utils/admin-api'
 import { useSession, authClient } from '#/utils/auth-client'
-import type { ApiUser } from '#/types'
-import { isDemoMode } from '#/utils/utils'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 const { admin: adminApi } = authClient
 
@@ -100,11 +97,7 @@ function AdminDashboard() {
   // self-destructive actions (ban / delete / remove own admin / revoke own
   // session).
   const currentUserId = sessionData?.user.id ?? null
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   const fetchUsers = useCallback(async (page: number, search?: string) => {
     setLoading(true)
@@ -152,7 +145,7 @@ function AdminDashboard() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const { data } = await api.get<AdminStats>('/admin/stats')
+      const data = await getStats<AdminStats>()
       setStats(data)
     } catch {
       // Non-critical: stats card just stays empty.
@@ -201,10 +194,7 @@ function AdminDashboard() {
   }
 
   const handleSetRole = async (user: User, role: 'user' | 'admin') => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     // Never let an admin strip their own admin role (self-lockout).
     if (user.id === currentUserId && role !== 'admin') {
@@ -222,7 +212,7 @@ function AdminDashboard() {
       return
     }
     try {
-      await api.post('/admin/set-role', { userId: user.id, role })
+      await setRole({ userId: user.id, role })
       toast.success(`Role updated to ${role}`)
       fetchUsers(currentPage, searchValue)
     } catch {
@@ -231,10 +221,7 @@ function AdminDashboard() {
   }
 
   const handleBanUser = async (userId: string, reason?: string, expiresIn?: number) => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     // Never ban yourself.
     if (userId === currentUserId) {
@@ -255,10 +242,7 @@ function AdminDashboard() {
   }
 
   const handleUnbanUser = async (userId: string) => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     try {
       await adminApi.unbanUser({ userId })
@@ -284,8 +268,8 @@ function AdminDashboard() {
 
   const handleExportUsers = async () => {
     try {
-      const response = await api.get('/admin/export-users', { responseType: 'blob' })
-      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const blob = await exportUsersCsv()
+      const url = window.URL.createObjectURL(new Blob([blob]))
       const a = document.createElement('a')
       a.href = url
       a.download = 'users-export.csv'
@@ -298,10 +282,7 @@ function AdminDashboard() {
   }
 
   const handleBulkAction = async (action: BulkAction) => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     if (selectedIds.size === 0) {
       toast.error('No users selected')
@@ -309,7 +290,7 @@ function AdminDashboard() {
     }
     setBulkActionLoading(true)
     try {
-      await api.post('/admin/bulk-actions', { userIds: Array.from(selectedIds), action })
+      await bulkAction({ userIds: Array.from(selectedIds), action })
       toast.success(`${action} applied to ${selectedIds.size} users`)
       setSelectedIds(new Set())
       fetchUsers(currentPage, searchValue)

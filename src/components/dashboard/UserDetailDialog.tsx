@@ -27,12 +27,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import api from '#/utils/axios'
+import { verifyEmail, listAccounts, getUserActivity } from '#/utils/admin-api'
 import { useSession, authClient } from '#/utils/auth-client'
 import InputError from '#/components/InputError'
 import type { Account, ActivityLog, Session,  UserDetailDialogProps } from '#/types'
-import { isDemoMode } from '#/utils/utils'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 const { admin: adminApi } = authClient
 
@@ -41,11 +40,7 @@ const { admin: adminApi } = authClient
 export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, canManage = true }: UserDetailDialogProps) {
   const { data: sessionData } = useSession()
   const currentUserId = sessionData?.user.id ?? null
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   const [sessions, setSessions] = useState<Array<Session>>([])
   const [sessionsLoading, setSessionsLoading] = useState(false)
@@ -69,10 +64,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     defaultValues: { newPassword: '' },
     onSubmit: async ({ value }) => {
       if (!user) return
-      if (demoMode) {
-        showDemoModeMessage()
-        return
-      }
+      if (blocked()) return
 
       const newPassword = value.newPassword
       if (!newPassword.trim()) return
@@ -98,10 +90,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     },
     onSubmit: async ({ value }) => {
       if (!user) return
-      if (demoMode) {
-        showDemoModeMessage()
-        return
-      }
+      if (blocked()) return
 
       const data: Record<string, string> = {}
       if (value.name.trim() && value.name.trim() !== user.name) data.name = value.name.trim()
@@ -133,7 +122,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     try {
       const [sessionsRes, accountsRes] = await Promise.all([
         adminApi.listUserSessions({ userId: id }).then((r) => r.data?.sessions ?? []),
-        api.get<{ data: Array<Account> }>('/admin/accounts', { params: { userId: id } }),
+        listAccounts<Account>(id),
       ])
       if (shownUserIdRef.current !== id) return
       setSessions(
@@ -151,7 +140,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
           }),
         ),
       )
-      setAccounts(accountsRes.data.data)
+      setAccounts(accountsRes.data)
     } catch {
       if (shownUserIdRef.current === id) toast.error('Failed to fetch user details')
     } finally {
@@ -186,14 +175,11 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleToggleVerify = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     const verified = !user.emailVerified
     try {
-      await api.post('/admin/email-verify', { userId: user.id, verified })
+      await verifyEmail({ userId: user.id, verified })
       toast.success(verified ? 'Email verified' : 'Email unverified')
       onUserUpdated(user.id, { emailVerified: verified })
     } catch {
@@ -202,10 +188,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleSetPassword = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     setSettingPassword(true)
     try {
@@ -216,10 +199,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleOpenEdit = () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     editUserForm.setFieldValue('name', user.name)
     editUserForm.setFieldValue('email', user.email)
@@ -227,10 +207,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleUpdateUser = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     setSavingEdit(true)
     try {
@@ -241,10 +218,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleDeleteUser = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
 
     // Never delete yourself.
     if (user.id === currentUserId) {
@@ -264,10 +238,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleRevokeSession = async (token: string) => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     setBusy(`revoke-session:${token}`)
     try {
       await adminApi.revokeUserSession({ sessionToken: token })
@@ -281,10 +252,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
   }
 
   const handleRevokeAllSessions = async () => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     setBusy(`revoke-all:${user.id}`)
     try {
       await adminApi.revokeUserSessions({ userId: user.id })
@@ -301,9 +269,7 @@ export function UserDetailDialog({ user, onClose, onUserDeleted, onUserUpdated, 
     setActivityLoading(true)
     setActivityOpen(true)
     try {
-      const { data } = await api.get<{ data: ActivityLog[] }>('/admin/user-activity', {
-        params: { userId: user.id },
-      })
+      const data = await getUserActivity<ActivityLog>({ userId: user.id })
       setActivityLogs(data.data)
     } catch {
       toast.error('Failed to fetch activity')

@@ -19,9 +19,9 @@ import {
   SelectValue,
 } from '#/components/ui/select'
 import { adminMiddleware } from '#/middleware/admin'
-import api from '#/utils/axios'
+import { listAuditLogs } from '#/utils/admin-api'
 import type { AuditEntry } from '#/types'
-import { ACTION_COLORS, ACTION_LABELS } from '#/utils/constants'
+import { ACTION_COLORS, ACTION_LABELS } from '#/utils/audit-actions'
 
 
 
@@ -44,9 +44,12 @@ function AuditLogPage() {
   const fetchLogs = useCallback(async () => {
     setLoading(true)
     try {
-      const params: Record<string, string | number> = { page, limit }
+      const params: { page: number; limit: number; action?: string } = {
+        page,
+        limit,
+      }
       if (searchAction) params.action = searchAction
-      const { data } = await api.get('/admin/audit-logs', { params })
+      const data = await listAuditLogs<AuditEntry>(params)
       setLogs(data.data)
       setTotal(data.total)
     } catch {

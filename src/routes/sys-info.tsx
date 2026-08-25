@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Button } from '#/components/ui/button'
 import { adminMiddleware } from '#/middleware/admin'
-import api from '#/utils/axios'
+import { getHardware } from '#/utils/admin-api'
 import type { HardwareData } from '#/types'
 
 
@@ -50,7 +50,7 @@ function SysInfo() {
   const fetchHardware = useCallback(async () => {
     setLoading(true)
     try {
-      const { data: hw } = await api.get<HardwareData>('/admin/hardware')
+      const hw = await getHardware<HardwareData>()
       setData(hw)
     } catch {
       toast.error('Failed to fetch system info')

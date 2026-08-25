@@ -42,9 +42,26 @@ function createSqliteDb() {
   return drizzleBetterSqlite(sqlite, { schema: sqliteSchema })
 }
 
-// `db` is intentionally loosely typed: the concrete driver (pg vs sqlite) is
-// chosen at runtime, so callers access columns through the schema instead.
-export const db: any = dbDriver === 'sqlite' ? createSqliteDb() : createPgDb()
+/**
+ * Canonical database interface.
+ *
+ * The concrete driver (pg / better-sqlite3 / libsql) is chosen at runtime, but
+ * every dialect infers the same TypeScript row shapes (`integer({mode:
+ * 'timestamp'})` → Date, `integer({mode: 'boolean'})` → boolean, …), so the
+ * pg instance's type serves as the single interface all three adapters
+ * satisfy. The drift-check test guards that the schema files stay equivalent.
+ */
+export type AppDatabase = ReturnType<typeof createPgDb>
 
-// Re-export the correct schema based on driver
-export const schema = dbDriver === 'sqlite' ? sqliteSchema : pgSchema
+// The concrete driver (pg vs sqlite) is chosen at runtime; callers access
+// columns through the re-exported `schema`.
+export const db: AppDatabase =
+  dbDriver === 'sqlite'
+    ? (createSqliteDb() as unknown as AppDatabase)
+    : createPgDb()
+
+// Re-export the correct schema based on driver; typed as the pg shape for the
+// same reason as `db` above.
+export const schema = (
+  dbDriver === 'sqlite' ? sqliteSchema : pgSchema
+) as typeof pgSchema

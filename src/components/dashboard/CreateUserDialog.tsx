@@ -18,11 +18,10 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import { Select, SelectItem } from '#/components/ui/select'
-import api from '#/utils/axios'
+import { checkEmail } from '#/utils/admin-api'
 import { authClient } from '#/utils/auth-client'
 import InputError from '#/components/InputError'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
-import { isDemoMode } from '#/utils/utils'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 
 
@@ -33,11 +32,7 @@ export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {
   const [emailTaken, setEmailTaken] = useState<boolean | null>(null)
   const [checkingEmail, setCheckingEmail] = useState(false)
   const checkSeq = useRef(0)
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   const form = useForm({
     defaultValues: {
@@ -47,12 +42,9 @@ export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {
       role: 'user',
     },
     onSubmit: async ({ value }) => {
-      if (demoMode) {
-        showDemoModeMessage()
-        return
-      }
+      if (blocked()) return
       const email = value.email.trim()
-      const { data } = await api.post<{ exists: boolean }>('/admin/check-email', { email })
+      const data = await checkEmail(email)
       if (data.exists) {
         form.setFieldValue('email', value.email)
         setEmailTaken(true)
@@ -86,9 +78,7 @@ export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {
     const seq = ++checkSeq.current
     const timer = setTimeout(async () => {
       try {
-        const { data } = await api.post<{ exists: boolean }>('/admin/check-email', {
-          email: value,
-        })
+        const data = await checkEmail(value)
         if (seq === checkSeq.current) setEmailTaken(data.exists)
       } catch {
         if (seq === checkSeq.current) setEmailTaken(null)

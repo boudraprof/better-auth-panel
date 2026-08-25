@@ -17,7 +17,7 @@ import { defaultStatements } from 'better-auth/plugins/organization/access'
 
 // Reuse the plugin's default statements (organization / member / invitation /
 // team / ac) and add a `billing` resource with its own actions.
-export const statement = {
+const statement = {
   ...defaultStatements,
   billing: ['read', 'manage'] as const,
 } as const
@@ -28,7 +28,7 @@ export const ac = createAccessControl(statement)
 // with the extended statements. `adminAc`/`ownerAc`/`memberAc` from the plugin
 // are typed against the default statements; we rebuild them here to keep a
 // single source of truth.
-export const owner = ac.newRole({
+const owner = ac.newRole({
   organization: ['update', 'delete'],
   member: ['create', 'update', 'delete'],
   invitation: ['create', 'cancel'],
@@ -37,7 +37,7 @@ export const owner = ac.newRole({
   billing: ['read', 'manage'],
 })
 
-export const admin = ac.newRole({
+const admin = ac.newRole({
   organization: ['update'],
   member: ['create', 'update', 'delete'],
   invitation: ['create', 'cancel'],
@@ -46,7 +46,7 @@ export const admin = ac.newRole({
   billing: ['read', 'manage'],
 })
 
-export const member = ac.newRole({
+const member = ac.newRole({
   organization: [],
   member: [],
   invitation: [],
@@ -57,7 +57,7 @@ export const member = ac.newRole({
 
 // Custom role: can view the org and manage billing, but cannot touch members,
 // invitations or teams. Useful for finance staff in a multi-tenant org.
-export const billing = ac.newRole({
+const billing = ac.newRole({
   organization: [],
   member: [],
   invitation: [],

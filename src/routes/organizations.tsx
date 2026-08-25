@@ -17,10 +17,9 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import { adminMiddleware } from '#/middleware/admin'
-import api from '#/utils/axios'
-import {  isDemoMode } from '#/utils/utils'
+import { deleteOrganization, listOrganizations, listOrganizationMembers } from '#/utils/admin-api'
 import type { Organization, OrgMember } from '#/types'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 
 
@@ -44,16 +43,12 @@ function OrganizationsPage() {
   const [membersOrg, setMembersOrg] = useState<Organization | null>(null)
   const [members, setMembers] = useState<OrgMember[]>([])
   const [membersLoading, setMembersLoading] = useState(false)
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   const fetchOrgs = useCallback(async () => {
     setLoading(true)
     try {
-      const { data } = await api.get<{ data?: Organization[] }>('/admin/organizations')
+      const data = await listOrganizations<Organization>()
       setOrgs(data.data || [])
     } catch {
       toast.error('Failed to fetch organizations')
@@ -71,9 +66,7 @@ function OrganizationsPage() {
     setMembers([])
     setMembersLoading(true)
     try {
-      const { data } = await api.get<{ data?: OrgMember[] }>('/admin/organizations/members', {
-        params: { orgId: org.id },
-      })
+      const data = await listOrganizationMembers<OrgMember>(org.id)
       setMembers(data.data || [])
     } catch {
       toast.error('Failed to fetch members')
@@ -83,13 +76,10 @@ function OrganizationsPage() {
   }
 
   const handleDelete = async (org: Organization) => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     setDeletingId(org.id)
     try {
-      await api.post('/admin/organizations/delete', { orgId: org.id })
+      await deleteOrganization(org.id)
       toast.success(`Deleted ${org.name}`)
       setOrgs((prev) => prev.filter((o) => o.id !== org.id))
     } catch {

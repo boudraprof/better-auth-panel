@@ -177,7 +177,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '#/components/ui/tooltip'
-import api from '#/utils/axios'
+import { getHardware } from '#/utils/admin-api'
 
 type ServerStatusData = {
   hostname: string
@@ -251,8 +251,7 @@ export default function ServerStatus() {
 
   const fetchStatus = useCallback(async () => {
     try {
-      const { data: hw } =
-        await api.get<ServerStatusData>('/admin/hardware')
+      const hw = await getHardware<ServerStatusData>()
 
       setData(hw)
       setOffline(false)

@@ -8,10 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog'
-import api from '#/utils/axios'
+import { revokeSession, listSessions } from '#/utils/admin-api'
 import type { GlobalSession, UserAgentInfo } from '#/types'
-import { isDemoMode } from '#/utils/utils'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 
 
@@ -49,16 +48,12 @@ export function GlobalSessionsDialog({ open, onOpenChange, canRevoke = true }: P
   const [sessions, setSessions] = useState<Array<GlobalSession>>([])
   const [loading, setLoading] = useState(false)
   const [revokingId, setRevokingId] = useState<string | null>(null)
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   const fetchSessions = useCallback(async () => {
     setLoading(true)
     try {
-      const { data } = await api.get<{ data: Array<GlobalSession> }>('/admin/sessions')
+      const data = await listSessions<GlobalSession>()
       setSessions(data.data)
     } catch {
       toast.error('Failed to fetch sessions')
@@ -73,13 +68,10 @@ export function GlobalSessionsDialog({ open, onOpenChange, canRevoke = true }: P
   }, [open, fetchSessions])
 
   const handleRevoke = async (sessionId: string) => {
-    if (demoMode) {
-      showDemoModeMessage()
-      return
-    }
+    if (blocked()) return
     setRevokingId(sessionId)
     try {
-      await api.post('/admin/sessions/revoke', { sessionId })
+      await revokeSession(sessionId)
       toast.success('Session revoked')
       void fetchSessions()
     } catch {

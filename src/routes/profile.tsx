@@ -36,8 +36,7 @@ import { authedMiddleware } from '#/middleware/authed'
 import { useSession, authClient } from '#/utils/auth-client'
 import { normalizeRole } from '#/utils/permissions'
 import InputError from '#/components/InputError'
-import { isDemoMode } from '#/utils/utils'
-import { DEMO_MODE_MESSAGE } from '#/utils/constants'
+import { useDemoAction } from "#/hooks/use-demo-action"
 
 const { updateUser, changePassword, changeEmail, deleteUser } = authClient
 
@@ -66,20 +65,13 @@ function ProfilePage() {
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const demoMode = isDemoMode()
-
-  const showDemoModeMessage = () => {
-    toast.info(DEMO_MODE_MESSAGE)
-  }
+  const { blocked } = useDemoAction()
 
   // Profile (name + image) form.
   const profileForm = useForm({
     defaultValues: { name: user?.name ?? '', image: user?.image ?? '' },
     onSubmit: async ({ value }) => {
-      if (demoMode) {
-        showDemoModeMessage()
-        return
-      }
+      if (blocked()) return
 
       const data: Record<string, string> = {}
       if (value.name.trim() && value.name.trim() !== user?.name)
@@ -102,10 +94,7 @@ function ProfilePage() {
   const passwordForm = useForm({
     defaultValues: { currentPassword: '', newPassword: '', confirm: '' },
     onSubmit: async ({ value }) => {
-      if (demoMode) {
-        showDemoModeMessage()
-        return
-      }
+      if (blocked()) return
 
       const res = await changePassword({
         currentPassword: value.currentPassword,
@@ -125,10 +114,7 @@ function ProfilePage() {
   const emailForm = useForm({
     defaultValues: { newEmail: '' },
     onSubmit: async ({ value }) => {
-      if (demoMode) {
-        showDemoModeMessage()
-        return
-      }
+      if (blocked()) return
 
       const res = await changeEmail({
         newEmail: value.newEmail.trim(),
@@ -144,8 +130,7 @@ function ProfilePage() {
   })
 
   const handleDelete = async (password: string) => {
-    if (demoMode) {
-      showDemoModeMessage()
+    if (blocked()) {
       setDeleteOpen(false)
       return
     }
@@ -490,10 +475,7 @@ function ProfilePage() {
           <Button
             variant="destructive"
             onClick={() => {
-              if (demoMode) {
-                showDemoModeMessage()
-                return
-              }
+              if (blocked()) return
               setDeleteOpen(true)
             }}
           >
